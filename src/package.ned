@@ -1,0 +1,3 @@
+package harddiskwriteoperations;
+
+@license(LGPL);
