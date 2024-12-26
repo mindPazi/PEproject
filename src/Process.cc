@@ -56,7 +56,7 @@ void Process::handleMessage(cMessage *msg)
             //in ogni writeReq
             WriteRequest *writeReq = new WriteRequest("WriteRequest");
             writeReq->setProcessId(processId);
-            writeReq->setFileId(fileCount);
+            writeReq->setFileId(fileCount); //
             writeReq->setFileSize(fileSize);
             writeReq->setChunkSize(chunkSize_);
             writeReq->setStartTime(simTime());

@@ -21,9 +21,12 @@ package harddiskwriteoperations;
 simple Disk
 {
     parameters:
-        double writeSpeed; //velocità di scrittura del disco
-        double seekTime; //tempo per muovere la testina
-        double interChunkDelay; //tempo che intercorre tra due scrittura consecutive dello stesso file
+        double writeSpeed; // W velocità di scrittura del disco
+        double seekTime; // S tempo per muovere la testina
+        double interChunkDelay; // L tempo che intercorre tra due scrittura consecutive dello stesso file
+        int maxChunkSize; // K
+        //collezionare statistiche del seek time
+        // statistica di L
    	gates:
    		input in;
 }

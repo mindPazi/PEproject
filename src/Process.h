@@ -43,7 +43,7 @@ private:
     std::vector<double> chunkSizes_; // K
 
     // Identificatore unico del file
-    int fileCount_;
+    int fileCount_; // da modificare con un booleano "è lo stesso file del processo precedente?"
 
     // Timer per la prossima generazione di file
     cMessage *fileGenerationMsg_;

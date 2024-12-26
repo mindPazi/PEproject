@@ -22,10 +22,7 @@ simple Process
 {
     parameters:
         int processId;
-        int chunkSize;
-        bool uniformInterarrivals = default(true);
-        bool uniformFileSizes = default(true);
-        double maxInterarrivalTime @unit(s) = default(3s);  //Tmax
+        int fileSize; // B
         
         @signal[writeFileTime];
         @statistic[writeFileTimeStats](source="writeFileTime"; record=mean,vector);

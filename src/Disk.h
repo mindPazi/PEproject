@@ -24,28 +24,30 @@ using namespace omnetpp;
 class Disk : public cSimpleModule
 {
   private:
-    double writeSpeed; // MB/s (W)
-    double seekTime; // Millisecondi (S)
-    double interChunkDelay; // Millisecondi (L)
+    double writeSpeed_; // MB/s (W)
+    double seekTime_; // Millisecondi (S)
+    double interChunkDelay_; // Millisecondi (L)
+    int maxChunkSize_; // K
 
-    bool busy;
-    std::queue<WriteRequest*> writeQueue;
+    bool busy_;
+    std::queue<WriteRequest*> writeQueue; // coda delle richieste di scrittura
 
     // Metriche
-    double totalBusyTime;
-    simtime_t lastBusyStart;
+    double totalBusyTime_;
+    simtime_t lastBusyStart_;
 
-    int maxQueueLength;
-    double totalQueueLengthTime;
-    simtime_t lastQueueLengthChange;
+    int maxQueueLength_;
+    double totalQueueLengthTime_;
+    simtime_t lastQueueLengthChange_;
 
     // Tracciamento dei file
-    std::unordered_map<int, FileInfo> fileInfos;
+    std::unordered_map<int, FileInfo> fileInfos; // probabilmente inutile tenere una mappa dei file
 
   protected:
     virtual void initialize() override;
     virtual void handleMessage(cMessage *msg) override;
     virtual void finish() override;
+    int getChunkSize();
 };
 
 #endif
