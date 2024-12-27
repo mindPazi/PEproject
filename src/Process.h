@@ -17,6 +17,7 @@
 #define __HARDDISKWRITEOPERATIONS_PROCESS_H_
 
 #include <omnetpp.h>
+#include "WriteRequest_m.h"
 
 using namespace omnetpp;
 
@@ -27,30 +28,25 @@ class Process : public cSimpleModule
 {
 private:
     int processId_;
-    int chunkSize_;
-    simsignal_t writeFileTime_;
-    bool uniformInterArrivals_;
-    bool uniformFileSizes_;
-    std::exponential_distribution<> interArrivalDist_;
-    std::mt19937 generator_;
+    simsignal_t lastTimeSent_;
 
-    // Distribuzioni delle dimensioni dei file
-    std::uniform_real_distribution<> uniformDist_;
-    std::exponential_distribution<> exponentialDist_;
-    bool useUniform_;
+    //Distribuzione di T
+    double meanInterArrivalDistribution;
+    //std::exponential_distribution<> interArrivalDist_;
+    //std::mt19937 generator_;
 
-    // Parametri dei chunk
-    std::vector<double> chunkSizes_; // K
+    // Distribuzioni di B
 
-    // Identificatore unico del file
-    int fileCount_; // da modificare con un booleano "è lo stesso file del processo precedente?"
+    bool uniformWriteSizes_;
+    //std::uniform_real_distribution<> uniformDist_;
+    //std::exponential_distribution<> exponentialDist_;
+    bool waitingForResponse;
 
-    // Timer per la prossima generazione di file
-    cMessage *fileGenerationMsg_;
 
   protected:
     virtual void initialize() override;
     virtual void handleMessage(cMessage *msg) override;
+    void sendWriteRequest();
     virtual void finish() override;
 };
 

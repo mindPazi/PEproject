@@ -1,5 +1,5 @@
 //
-// Generated file, do not edit! Created by opp_msgtool 6.1 from WriteRequest.msg.
+// Generated file, do not edit! Created by opp_msgtool 6.0 from WriteRequest.msg.
 //
 
 // Disable warnings about unused variables, empty switch stmts, etc:
@@ -163,7 +163,6 @@ WriteRequest::WriteRequest(const WriteRequest& other) : ::omnetpp::cPacket(other
 
 WriteRequest::~WriteRequest()
 {
-    delete [] this->arrayField1;
 }
 
 WriteRequest& WriteRequest::operator=(const WriteRequest& other)
@@ -176,146 +175,55 @@ WriteRequest& WriteRequest::operator=(const WriteRequest& other)
 
 void WriteRequest::copy(const WriteRequest& other)
 {
-    this->someField = other.someField;
-    this->anotherField = other.anotherField;
-    delete [] this->arrayField1;
-    this->arrayField1 = (other.arrayField1_arraysize==0) ? nullptr : new double[other.arrayField1_arraysize];
-    arrayField1_arraysize = other.arrayField1_arraysize;
-    for (size_t i = 0; i < arrayField1_arraysize; i++) {
-        this->arrayField1[i] = other.arrayField1[i];
-    }
-    for (size_t i = 0; i < 10; i++) {
-        this->arrayField2[i] = other.arrayField2[i];
-    }
+    this->bytesToWrite = other.bytesToWrite;
+    this->fileName = other.fileName;
+    this->processId = other.processId;
 }
 
 void WriteRequest::parsimPack(omnetpp::cCommBuffer *b) const
 {
     ::omnetpp::cPacket::parsimPack(b);
-    doParsimPacking(b,this->someField);
-    doParsimPacking(b,this->anotherField);
-    b->pack(arrayField1_arraysize);
-    doParsimArrayPacking(b,this->arrayField1,arrayField1_arraysize);
-    doParsimArrayPacking(b,this->arrayField2,10);
+    doParsimPacking(b,this->bytesToWrite);
+    doParsimPacking(b,this->fileName);
+    doParsimPacking(b,this->processId);
 }
 
 void WriteRequest::parsimUnpack(omnetpp::cCommBuffer *b)
 {
     ::omnetpp::cPacket::parsimUnpack(b);
-    doParsimUnpacking(b,this->someField);
-    doParsimUnpacking(b,this->anotherField);
-    delete [] this->arrayField1;
-    b->unpack(arrayField1_arraysize);
-    if (arrayField1_arraysize == 0) {
-        this->arrayField1 = nullptr;
-    } else {
-        this->arrayField1 = new double[arrayField1_arraysize];
-        doParsimArrayUnpacking(b,this->arrayField1,arrayField1_arraysize);
-    }
-    doParsimArrayUnpacking(b,this->arrayField2,10);
+    doParsimUnpacking(b,this->bytesToWrite);
+    doParsimUnpacking(b,this->fileName);
+    doParsimUnpacking(b,this->processId);
 }
 
-int WriteRequest::getSomeField() const
+int WriteRequest::getBytesToWrite() const
 {
-    return this->someField;
+    return this->bytesToWrite;
 }
 
-void WriteRequest::setSomeField(int someField)
+void WriteRequest::setBytesToWrite(int bytesToWrite)
 {
-    this->someField = someField;
+    this->bytesToWrite = bytesToWrite;
 }
 
-const char * WriteRequest::getAnotherField() const
+char WriteRequest::getFileName() const
 {
-    return this->anotherField.c_str();
+    return this->fileName;
 }
 
-void WriteRequest::setAnotherField(const char * anotherField)
+void WriteRequest::setFileName(char fileName)
 {
-    this->anotherField = anotherField;
+    this->fileName = fileName;
 }
 
-size_t WriteRequest::getArrayField1ArraySize() const
+int WriteRequest::getProcessId() const
 {
-    return arrayField1_arraysize;
+    return this->processId;
 }
 
-double WriteRequest::getArrayField1(size_t k) const
+void WriteRequest::setProcessId(int processId)
 {
-    if (k >= arrayField1_arraysize) throw omnetpp::cRuntimeError("Array of size %lu indexed by %lu", (unsigned long)arrayField1_arraysize, (unsigned long)k);
-    return this->arrayField1[k];
-}
-
-void WriteRequest::setArrayField1ArraySize(size_t newSize)
-{
-    double *arrayField12 = (newSize==0) ? nullptr : new double[newSize];
-    size_t minSize = arrayField1_arraysize < newSize ? arrayField1_arraysize : newSize;
-    for (size_t i = 0; i < minSize; i++)
-        arrayField12[i] = this->arrayField1[i];
-    for (size_t i = minSize; i < newSize; i++)
-        arrayField12[i] = 0;
-    delete [] this->arrayField1;
-    this->arrayField1 = arrayField12;
-    arrayField1_arraysize = newSize;
-}
-
-void WriteRequest::setArrayField1(size_t k, double arrayField1)
-{
-    if (k >= arrayField1_arraysize) throw omnetpp::cRuntimeError("Array of size %lu indexed by %lu", (unsigned long)arrayField1_arraysize, (unsigned long)k);
-    this->arrayField1[k] = arrayField1;
-}
-
-void WriteRequest::insertArrayField1(size_t k, double arrayField1)
-{
-    if (k > arrayField1_arraysize) throw omnetpp::cRuntimeError("Array of size %lu indexed by %lu", (unsigned long)arrayField1_arraysize, (unsigned long)k);
-    size_t newSize = arrayField1_arraysize + 1;
-    double *arrayField12 = new double[newSize];
-    size_t i;
-    for (i = 0; i < k; i++)
-        arrayField12[i] = this->arrayField1[i];
-    arrayField12[k] = arrayField1;
-    for (i = k + 1; i < newSize; i++)
-        arrayField12[i] = this->arrayField1[i-1];
-    delete [] this->arrayField1;
-    this->arrayField1 = arrayField12;
-    arrayField1_arraysize = newSize;
-}
-
-void WriteRequest::appendArrayField1(double arrayField1)
-{
-    insertArrayField1(arrayField1_arraysize, arrayField1);
-}
-
-void WriteRequest::eraseArrayField1(size_t k)
-{
-    if (k >= arrayField1_arraysize) throw omnetpp::cRuntimeError("Array of size %lu indexed by %lu", (unsigned long)arrayField1_arraysize, (unsigned long)k);
-    size_t newSize = arrayField1_arraysize - 1;
-    double *arrayField12 = (newSize == 0) ? nullptr : new double[newSize];
-    size_t i;
-    for (i = 0; i < k; i++)
-        arrayField12[i] = this->arrayField1[i];
-    for (i = k; i < newSize; i++)
-        arrayField12[i] = this->arrayField1[i+1];
-    delete [] this->arrayField1;
-    this->arrayField1 = arrayField12;
-    arrayField1_arraysize = newSize;
-}
-
-size_t WriteRequest::getArrayField2ArraySize() const
-{
-    return 10;
-}
-
-double WriteRequest::getArrayField2(size_t k) const
-{
-    if (k >= 10) throw omnetpp::cRuntimeError("Array of size %lu indexed by %lu", (unsigned long)10, (unsigned long)k);
-    return this->arrayField2[k];
-}
-
-void WriteRequest::setArrayField2(size_t k, double arrayField2)
-{
-    if (k >= 10) throw omnetpp::cRuntimeError("Array of size %lu indexed by %lu", (unsigned long)10, (unsigned long)k);
-    this->arrayField2[k] = arrayField2;
+    this->processId = processId;
 }
 
 class WriteRequestDescriptor : public omnetpp::cClassDescriptor
@@ -323,10 +231,9 @@ class WriteRequestDescriptor : public omnetpp::cClassDescriptor
   private:
     mutable const char **propertyNames;
     enum FieldConstants {
-        FIELD_someField,
-        FIELD_anotherField,
-        FIELD_arrayField1,
-        FIELD_arrayField2,
+        FIELD_bytesToWrite,
+        FIELD_fileName,
+        FIELD_processId,
     };
   public:
     WriteRequestDescriptor();
@@ -393,7 +300,7 @@ const char *WriteRequestDescriptor::getProperty(const char *propertyName) const
 int WriteRequestDescriptor::getFieldCount() const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
-    return base ? 4+base->getFieldCount() : 4;
+    return base ? 3+base->getFieldCount() : 3;
 }
 
 unsigned int WriteRequestDescriptor::getFieldTypeFlags(int field) const
@@ -405,12 +312,11 @@ unsigned int WriteRequestDescriptor::getFieldTypeFlags(int field) const
         field -= base->getFieldCount();
     }
     static unsigned int fieldTypeFlags[] = {
-        FD_ISEDITABLE,    // FIELD_someField
-        FD_ISEDITABLE,    // FIELD_anotherField
-        FD_ISARRAY | FD_ISEDITABLE | FD_ISRESIZABLE,    // FIELD_arrayField1
-        FD_ISARRAY | FD_ISEDITABLE,    // FIELD_arrayField2
+        FD_ISEDITABLE,    // FIELD_bytesToWrite
+        FD_ISEDITABLE,    // FIELD_fileName
+        FD_ISEDITABLE,    // FIELD_processId
     };
-    return (field >= 0 && field < 4) ? fieldTypeFlags[field] : 0;
+    return (field >= 0 && field < 3) ? fieldTypeFlags[field] : 0;
 }
 
 const char *WriteRequestDescriptor::getFieldName(int field) const
@@ -422,22 +328,20 @@ const char *WriteRequestDescriptor::getFieldName(int field) const
         field -= base->getFieldCount();
     }
     static const char *fieldNames[] = {
-        "someField",
-        "anotherField",
-        "arrayField1",
-        "arrayField2",
+        "bytesToWrite",
+        "fileName",
+        "processId",
     };
-    return (field >= 0 && field < 4) ? fieldNames[field] : nullptr;
+    return (field >= 0 && field < 3) ? fieldNames[field] : nullptr;
 }
 
 int WriteRequestDescriptor::findField(const char *fieldName) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     int baseIndex = base ? base->getFieldCount() : 0;
-    if (strcmp(fieldName, "someField") == 0) return baseIndex + 0;
-    if (strcmp(fieldName, "anotherField") == 0) return baseIndex + 1;
-    if (strcmp(fieldName, "arrayField1") == 0) return baseIndex + 2;
-    if (strcmp(fieldName, "arrayField2") == 0) return baseIndex + 3;
+    if (strcmp(fieldName, "bytesToWrite") == 0) return baseIndex + 0;
+    if (strcmp(fieldName, "fileName") == 0) return baseIndex + 1;
+    if (strcmp(fieldName, "processId") == 0) return baseIndex + 2;
     return base ? base->findField(fieldName) : -1;
 }
 
@@ -450,12 +354,11 @@ const char *WriteRequestDescriptor::getFieldTypeString(int field) const
         field -= base->getFieldCount();
     }
     static const char *fieldTypeStrings[] = {
-        "int",    // FIELD_someField
-        "string",    // FIELD_anotherField
-        "double",    // FIELD_arrayField1
-        "double",    // FIELD_arrayField2
+        "int",    // FIELD_bytesToWrite
+        "char",    // FIELD_fileName
+        "int",    // FIELD_processId
     };
-    return (field >= 0 && field < 4) ? fieldTypeStrings[field] : nullptr;
+    return (field >= 0 && field < 3) ? fieldTypeStrings[field] : nullptr;
 }
 
 const char **WriteRequestDescriptor::getFieldPropertyNames(int field) const
@@ -494,8 +397,6 @@ int WriteRequestDescriptor::getFieldArraySize(omnetpp::any_ptr object, int field
     }
     WriteRequest *pp = omnetpp::fromAnyPtr<WriteRequest>(object); (void)pp;
     switch (field) {
-        case FIELD_arrayField1: return pp->getArrayField1ArraySize();
-        case FIELD_arrayField2: return 10;
         default: return 0;
     }
 }
@@ -512,7 +413,6 @@ void WriteRequestDescriptor::setFieldArraySize(omnetpp::any_ptr object, int fiel
     }
     WriteRequest *pp = omnetpp::fromAnyPtr<WriteRequest>(object); (void)pp;
     switch (field) {
-        case FIELD_arrayField1: pp->setArrayField1ArraySize(size); break;
         default: throw omnetpp::cRuntimeError("Cannot set array size of field %d of class 'WriteRequest'", field);
     }
 }
@@ -541,10 +441,9 @@ std::string WriteRequestDescriptor::getFieldValueAsString(omnetpp::any_ptr objec
     }
     WriteRequest *pp = omnetpp::fromAnyPtr<WriteRequest>(object); (void)pp;
     switch (field) {
-        case FIELD_someField: return long2string(pp->getSomeField());
-        case FIELD_anotherField: return oppstring2string(pp->getAnotherField());
-        case FIELD_arrayField1: return double2string(pp->getArrayField1(i));
-        case FIELD_arrayField2: return double2string(pp->getArrayField2(i));
+        case FIELD_bytesToWrite: return long2string(pp->getBytesToWrite());
+        case FIELD_fileName: return long2string(pp->getFileName());
+        case FIELD_processId: return long2string(pp->getProcessId());
         default: return "";
     }
 }
@@ -561,10 +460,9 @@ void WriteRequestDescriptor::setFieldValueAsString(omnetpp::any_ptr object, int 
     }
     WriteRequest *pp = omnetpp::fromAnyPtr<WriteRequest>(object); (void)pp;
     switch (field) {
-        case FIELD_someField: pp->setSomeField(string2long(value)); break;
-        case FIELD_anotherField: pp->setAnotherField((value)); break;
-        case FIELD_arrayField1: pp->setArrayField1(i,string2double(value)); break;
-        case FIELD_arrayField2: pp->setArrayField2(i,string2double(value)); break;
+        case FIELD_bytesToWrite: pp->setBytesToWrite(string2long(value)); break;
+        case FIELD_fileName: pp->setFileName(string2long(value)); break;
+        case FIELD_processId: pp->setProcessId(string2long(value)); break;
         default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'WriteRequest'", field);
     }
 }
@@ -579,10 +477,9 @@ omnetpp::cValue WriteRequestDescriptor::getFieldValue(omnetpp::any_ptr object, i
     }
     WriteRequest *pp = omnetpp::fromAnyPtr<WriteRequest>(object); (void)pp;
     switch (field) {
-        case FIELD_someField: return pp->getSomeField();
-        case FIELD_anotherField: return pp->getAnotherField();
-        case FIELD_arrayField1: return pp->getArrayField1(i);
-        case FIELD_arrayField2: return pp->getArrayField2(i);
+        case FIELD_bytesToWrite: return pp->getBytesToWrite();
+        case FIELD_fileName: return pp->getFileName();
+        case FIELD_processId: return pp->getProcessId();
         default: throw omnetpp::cRuntimeError("Cannot return field %d of class 'WriteRequest' as cValue -- field index out of range?", field);
     }
 }
@@ -599,10 +496,9 @@ void WriteRequestDescriptor::setFieldValue(omnetpp::any_ptr object, int field, i
     }
     WriteRequest *pp = omnetpp::fromAnyPtr<WriteRequest>(object); (void)pp;
     switch (field) {
-        case FIELD_someField: pp->setSomeField(omnetpp::checked_int_cast<int>(value.intValue())); break;
-        case FIELD_anotherField: pp->setAnotherField(value.stringValue()); break;
-        case FIELD_arrayField1: pp->setArrayField1(i,value.doubleValue()); break;
-        case FIELD_arrayField2: pp->setArrayField2(i,value.doubleValue()); break;
+        case FIELD_bytesToWrite: pp->setBytesToWrite(omnetpp::checked_int_cast<int>(value.intValue())); break;
+        case FIELD_fileName: pp->setFileName(omnetpp::checked_int_cast<char>(value.intValue())); break;
+        case FIELD_processId: pp->setProcessId(omnetpp::checked_int_cast<int>(value.intValue())); break;
         default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'WriteRequest'", field);
     }
 }

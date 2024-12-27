@@ -18,14 +18,19 @@ package harddiskwriteoperations;
 //
 // TODO auto-generated module
 //
+
 simple Process
 {
     parameters:
         int processId;
-        int fileSize; // B
+        double meanInterArrivalDist;   // Media distribuzione esponenziale T
+        bool uniformWriteSizes = default(true);
+        double meanWriteSizeForExponential; //Media distribuzione esponenziale B
+        volatile double writeSizeForUniform = default(uniform(0,10)); //Range distribuzione uniforme
         
-        @signal[writeFileTime];
-        @statistic[writeFileTimeStats](source="writeFileTime"; record=mean,vector);
+        @signal[writeRequestResponseTime];
+        @statistic[meanResponseTime](source=writeRequestResponseTime; record=mean, vector);
     gates:
+    	input in;
         output out;
 }

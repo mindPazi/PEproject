@@ -24,55 +24,65 @@ void Process::initialize()
 {
     // inizializzazione dei parametri
     processId_ = par("processId").intValue;
-    uniformInterArrivals_ = par("uniformInterarrivals").boolValue();
-    uniformFileSizes_= par("uniformFileSizes").boolValue();
-    chunkSize_ = par("chunkSize");
-    double firstArrival;
+    meanInterArrivalDistribution = par("meanInterArrivalDist").doubleValue();
+    uniformWriteSizesDistribution= par("uniformWriteSizes").boolValue();
 
-    if(uniformInterArrivals_)
-        firstArrival = uniform(par("maxInterarrivalTime"));
-    else
-        firstArrival = exponential(par("maxInterarrivalTime"));
+    waitingForResponse = false;
 
-    fileGenerationMsg = new cMessage("GenerateFile");
-    scheduleAt(simTime() + firstArrival, fileGenerationMsg);
+    writeRequestResponseTimeSignal_ = registerSignal("writeRequestResponseTime");
+
+
+    scheduleAt(simTime() + exponential(meanInterArrivalDist), new cMessage("sendNextRequest"));
 }
 
 void Process::handleMessage(cMessage *msg)
 {
-    if (msg == fileGenerationMsg) {
-            // Generazione di un nuovo file
-            fileCount++;
-            double fileSize;
-            if (useUniform) {
-                fileSize = uniformDist(generator);
+    if (msg->isSelfMessage()) {
+    // Se non stiamo aspettando una risposta, invia una nuova richiesta
+        if (!waitingForResponse) {
+            sendWriteRequest();
             }
-            else {
-                fileSize = exponentialDist(generator);
-            }
+        delete msg;
+    }else {
+        // Ricezione di una risposta
+        EV << "Process " << processId << " received a response.\n";
 
-            // Creazione della richiesta di scrittura
-            // todo: creare un custom message WriteRequest e capire come gestirlo
-            //in ogni writeReq
-            WriteRequest *writeReq = new WriteRequest("WriteRequest");
-            writeReq->setProcessId(processId);
-            writeReq->setFileId(fileCount); //
-            writeReq->setFileSize(fileSize);
-            writeReq->setChunkSize(chunkSize_);
-            writeReq->setStartTime(simTime());
-
-            // Invio della richiesta al disco
-            send(writeReq, "out");
-
-            // Programmazione della prossima generazione di file
-            double nextArrival = interArrivalDist(generator);
-            scheduleAt(simTime() + nextArrival, fileGenerationMsg);
-        }
-        else {
-            // Gestione di eventuali messaggi di risposta dal disco
-            delete msg;
-        }
+        emit(writeRequestResponseTimeSignal_, (simTime() - lastTimeSent_));
+        waitingForResponse = false;
+        // Pianifica la prossima richiesta
+        scheduleAt(simTime() + exponential(meanInterArrivalDist), new cMessage("SendNextRequest"));
+        delete msg;
+   }
 }
+
+void sendWriteRequest() {
+       // Crea un messaggio WriteRequest
+       WriteRequest *request = new WriteRequest("WriteRequest");
+
+       // Calcola bytesToWrite in base alla distribuzione
+       int bytesToWrite;
+       if (uniformWriteSizesDistribution) {
+           bytesToWrite = par("writeSizeForUniform");
+       } else {
+           bytesToWrite = int(exponential(meanWriteSizesForExponential));
+       }
+
+       // Assegna i valori al messaggio
+       request->setBytesToWrite(bytesToWrite);
+       request->setFileName(("fileA").c_str());
+       request->setProcessId(processId);
+
+       // Salva il tempo di invio
+       lastTimeSent_ = simTime();
+
+       // Invia il messaggio
+       send(request, "out");
+       EV << "Process " << processId << " sent a WriteRequest with bytesToWrite=" << bytesToWrite
+          << ", fileName=" << request->getFileName() << "\n";
+
+       waitingForResponse = true;
+   }
+
 
 void Process::finish()
 {

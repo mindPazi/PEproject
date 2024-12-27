@@ -17,8 +17,7 @@
 // TODO generated message class
 //
 packet WriteRequest {
-    int someField;
-    string anotherField;
-    double arrayField1[];
-    double arrayField2[10];
+    int bytesToWrite; //B
+    char fileName;		//Nome file del tipo: fileA, fileB,....
+    int processId; //Id del processo
 }
