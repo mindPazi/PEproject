@@ -18,6 +18,7 @@
 
 #include <omnetpp.h>
 #include <queue>
+#include <CompletingAWrite_m.h>
 
 using namespace omnetpp;
 
@@ -29,25 +30,28 @@ class Disk : public cSimpleModule
     double interChunkDelay_; // Millisecondi (L)
     int maxChunkSize_; // K
 
+
     bool busy_;
     std::queue<WriteRequest*> writeQueue; // coda delle richieste di scrittura
 
     // Metriche
     double totalBusyTime_;
-    simtime_t lastBusyStart_;
-
     int maxQueueLength_;
+    simtime_t lastBusyStart_;
+    simsignal_t writeFileTimeSignal_;
+    simsignal_t writeChunkTimeSignal_;
+    simsignal_t queueLengthSignal_;
     double totalQueueLengthTime_;
+    simsignal_t busyPercentage_;
     simtime_t lastQueueLengthChange_;
 
-    // Tracciamento dei file
-    std::unordered_map<int, FileInfo> fileInfos; // probabilmente inutile tenere una mappa dei file
 
   protected:
     virtual void initialize() override;
     virtual void handleMessage(cMessage *msg) override;
     virtual void finish() override;
-    int getChunkSize();
+    int getChunkSize(int bytesRemainingToWrite, int i);
+    void writeAndSchedule(WriteRequest* nextReq);
 };
 
 #endif

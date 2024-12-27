@@ -25,8 +25,20 @@ simple Disk
         double seekTime; // S tempo per muovere la testina
         double interChunkDelay; // L tempo che intercorre tra due scrittura consecutive dello stesso file
         int maxChunkSize; // K
-        //collezionare statistiche del seek time
-        // statistica di L
+
+        @signal[writeFileTime];
+        @statistic[writeFileTimeStats](source="writeFileTime"; record=mean,vector);
+        
+        @signal[writeChunkTime];
+        @statistic[writeChunkTimeStats](source="writeChunkTime"; record=mean,vector);
+        
+        // num of processes in the queue
+        @signal[queueLength];
+        @statistic[queueLengthStats](source="queueLength"; record=mean);// è un solo valore
+        
+        @signal[busyPercentage];
+        @statistic[busyPercentageStats](source="busyPercentage"; record=mean);
+
    	gates:
    		input in;
 }
