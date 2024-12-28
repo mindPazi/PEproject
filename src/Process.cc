@@ -23,16 +23,18 @@ Define_Module(Process);
 void Process::initialize()
 {
     // inizializzazione dei parametri
-    processId_ = par("processId").intValue;
-    meanInterArrivalDistribution = par("meanInterArrivalDist").doubleValue();
-    uniformWriteSizesDistribution= par("uniformWriteSizes").boolValue();
+    processId_ = par("processId").intValue();
 
+    meanInterArrivalDistribution = par("meanInterArrivalDist").doubleValue();
+
+    uniformWriteSizeDistribution = par("uniformWriteSizes").boolValue();
+    meanWriteSizeForExponential = par("meanWriteSizeForExponential").doubleValue();
     waitingForResponse = false;
 
     writeRequestResponseTimeSignal_ = registerSignal("writeRequestResponseTime");
 
 
-    scheduleAt(simTime() + exponential(meanInterArrivalDist), new cMessage("sendNextRequest"));
+    scheduleAt(simTime() + exponential(meanInterArrivalDistribution), new cMessage("sendNextRequest"));
 }
 
 void Process::handleMessage(cMessage *msg)
@@ -45,39 +47,40 @@ void Process::handleMessage(cMessage *msg)
         delete msg;
     }else {
         // Ricezione di una risposta
-        EV << "Process " << processId << " received a response.\n";
+        EV << "Process " << processId_ << " received a response.\n";
 
         emit(writeRequestResponseTimeSignal_, (simTime() - lastTimeSent_));
         waitingForResponse = false;
         // Pianifica la prossima richiesta
-        scheduleAt(simTime() + exponential(meanInterArrivalDist), new cMessage("SendNextRequest"));
+        scheduleAt(simTime() + exponential(meanInterArrivalDistribution), new cMessage("SendNextRequest"));
         delete msg;
    }
 }
 
-void sendWriteRequest() {
+void Process::sendWriteRequest() {
        // Crea un messaggio WriteRequest
        WriteRequest *request = new WriteRequest("WriteRequest");
 
        // Calcola bytesToWrite in base alla distribuzione
        int bytesToWrite;
-       if (uniformWriteSizesDistribution) {
+       if (uniformWriteSizeDistribution){
            bytesToWrite = par("writeSizeForUniform");
        } else {
-           bytesToWrite = int(exponential(meanWriteSizesForExponential));
+           bytesToWrite = int(exponential(meanWriteSizeForExponential));
        }
 
        // Assegna i valori al messaggio
        request->setBytesToWrite(bytesToWrite);
-       request->setFileName(("fileA").c_str());
-       request->setProcessId(processId);
+
+       request->setFileName('A');
+       request->setProcessId(processId_);
 
        // Salva il tempo di invio
        lastTimeSent_ = simTime();
 
        // Invia il messaggio
        send(request, "out");
-       EV << "Process " << processId << " sent a WriteRequest with bytesToWrite=" << bytesToWrite
+       EV << "Process " << processId_<< " sent a WriteRequest with bytesToWrite=" << bytesToWrite
           << ", fileName=" << request->getFileName() << "\n";
 
        waitingForResponse = true;

@@ -28,18 +28,19 @@ class Process : public cSimpleModule
 {
 private:
     int processId_;
-    simsignal_t lastTimeSent_;
+    simtime_t lastTimeSent_;
 
     //Distribuzione di T
     double meanInterArrivalDistribution;
-    //std::exponential_distribution<> interArrivalDist_;
-    //std::mt19937 generator_;
 
+
+    simsignal_t writeRequestResponseTimeSignal_;
+
+    double meanWriteSizeForExponential;
     // Distribuzioni di B
+    bool uniformWriteSizeDistribution;
 
-    bool uniformWriteSizes_;
-    //std::uniform_real_distribution<> uniformDist_;
-    //std::exponential_distribution<> exponentialDist_;
+
     bool waitingForResponse;
 
 
