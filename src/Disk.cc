@@ -79,13 +79,12 @@ void Disk::handleMessage(cMessage *msg) {
         } else {
             cMessage* newExtraxtionTimer = new cMessage();
             //emit(writeFileTimeSignal_, msg->getSumChunkWriteTimes());//todo: capire se il write time lo gestisce il proc
+            sendWriteCompleted(cwMsg->getProcessId(), writeTime);
             delete msg;
             scheduleAt(simTime() + writeTime, newExtraxtionTimer);
         }
 
     } else if (dynamic_cast<cMessage*>(msg)) { //estrazione di un processo dalla coda
-//TODO: gestire la logica di estrazione
-    // Aggiorna il tempo totale di occupazione del disco
 
         // Verifica se ci sono altre richieste nella coda
         if (!writeQueue.empty()) {
@@ -143,21 +142,37 @@ void Disk::writeAndSchedule(WriteRequest *nextReq) {
         writeTime += maxChunkSize_ / writeSpeed_; // in secondi. Chunk_size(i)={B-iK se B<K, k altrimenti}
         cwMsg->setRemainingBytesToWrite(fileSize - maxChunkSize_);
         cwMsg->appendChunkWriteTimes(writeTime);
+        cwMsg->setProcessId(nextReq->getProcessId());
         emit(writeChunkTimeSignal_, writeTime);
         scheduleAt(simTime() + writeTime, cwMsg); // Programma il completamento della scrittura
     } else {
         writeTime += fileSize / writeSpeed_;
         emit(writeFileTimeSignal_, writeTime);
-        send(new cMessage(), "out");
+        sendWriteCompleted(nextReq->getProcessId(), writeTime);   //invia il messaggio di scrittura completata
         scheduleAt(simTime() + writeTime, new cMessage()); // gestisce l'estrazione di un processo dalla coda
     }
 }
+
 
 bool Disk::itsADifferentFile() {
     // ritorna con prob del 10% che il file sia lo stesso del precedente
     if (par("itsADifferentFileGenerator").doubleValue() <= 0.1)
         return true;
     return false;
+}
+
+void Disk::sendWriteCompleted(int processId, double writeTime){
+// Ottenere il modulo target usando il nome
+    std::string targetPath = "DiskSimulation.process[" + std::to_string(processId) + "]";
+    cModule *targetModule = getModuleByPath(targetPath.c_str());
+
+    WriteCompleted* writeCompleted = new WriteCompleted();
+    writeCompleted->setWriteTime(writeTime);
+
+    if (targetModule != nullptr) {
+        // Invia il messaggio alla porta di input del processo target
+        send(writeCompleted, "out", targetModule->getIndex());
+    }
 }
 
 void Disk::finish() {

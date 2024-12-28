@@ -1,5 +1,5 @@
 //
-// Generated file, do not edit! Created by opp_msgtool 6.1 from CompletingAWrite.msg.
+// Generated file, do not edit! Created by opp_msgtool 6.1 from WriteCompleted.msg.
 //
 
 // Disable warnings about unused variables, empty switch stmts, etc:
@@ -28,7 +28,7 @@
 #include <sstream>
 #include <memory>
 #include <type_traits>
-#include "CompletingAWrite_m.h"
+#include "WriteCompleted_m.h"
 
 namespace omnetpp {
 
@@ -150,23 +150,22 @@ void doParsimUnpacking(omnetpp::cCommBuffer *, T& t)
 
 }  // namespace omnetpp
 
-Register_Class(CompletingAWrite)
+Register_Class(WriteCompleted)
 
-CompletingAWrite::CompletingAWrite(const char *name, short kind) : ::omnetpp::cMessage(name, kind)
+WriteCompleted::WriteCompleted(const char *name, short kind) : ::omnetpp::cMessage(name, kind)
 {
 }
 
-CompletingAWrite::CompletingAWrite(const CompletingAWrite& other) : ::omnetpp::cMessage(other)
+WriteCompleted::WriteCompleted(const WriteCompleted& other) : ::omnetpp::cMessage(other)
 {
     copy(other);
 }
 
-CompletingAWrite::~CompletingAWrite()
+WriteCompleted::~WriteCompleted()
 {
-    delete [] this->chunkWriteTimes;
 }
 
-CompletingAWrite& CompletingAWrite::operator=(const CompletingAWrite& other)
+WriteCompleted& WriteCompleted::operator=(const WriteCompleted& other)
 {
     if (this == &other) return *this;
     ::omnetpp::cMessage::operator=(other);
@@ -174,154 +173,43 @@ CompletingAWrite& CompletingAWrite::operator=(const CompletingAWrite& other)
     return *this;
 }
 
-void CompletingAWrite::copy(const CompletingAWrite& other)
+void WriteCompleted::copy(const WriteCompleted& other)
 {
-    this->iteration = other.iteration;
-    this->remainingBytesToWrite = other.remainingBytesToWrite;
-    this->processId = other.processId;
-    delete [] this->chunkWriteTimes;
-    this->chunkWriteTimes = (other.chunkWriteTimes_arraysize==0) ? nullptr : new double[other.chunkWriteTimes_arraysize];
-    chunkWriteTimes_arraysize = other.chunkWriteTimes_arraysize;
-    for (size_t i = 0; i < chunkWriteTimes_arraysize; i++) {
-        this->chunkWriteTimes[i] = other.chunkWriteTimes[i];
-    }
+    this->writeTime = other.writeTime;
 }
 
-void CompletingAWrite::parsimPack(omnetpp::cCommBuffer *b) const
+void WriteCompleted::parsimPack(omnetpp::cCommBuffer *b) const
 {
     ::omnetpp::cMessage::parsimPack(b);
-    doParsimPacking(b,this->iteration);
-    doParsimPacking(b,this->remainingBytesToWrite);
-    doParsimPacking(b,this->processId);
-    b->pack(chunkWriteTimes_arraysize);
-    doParsimArrayPacking(b,this->chunkWriteTimes,chunkWriteTimes_arraysize);
+    doParsimPacking(b,this->writeTime);
 }
 
-void CompletingAWrite::parsimUnpack(omnetpp::cCommBuffer *b)
+void WriteCompleted::parsimUnpack(omnetpp::cCommBuffer *b)
 {
     ::omnetpp::cMessage::parsimUnpack(b);
-    doParsimUnpacking(b,this->iteration);
-    doParsimUnpacking(b,this->remainingBytesToWrite);
-    doParsimUnpacking(b,this->processId);
-    delete [] this->chunkWriteTimes;
-    b->unpack(chunkWriteTimes_arraysize);
-    if (chunkWriteTimes_arraysize == 0) {
-        this->chunkWriteTimes = nullptr;
-    } else {
-        this->chunkWriteTimes = new double[chunkWriteTimes_arraysize];
-        doParsimArrayUnpacking(b,this->chunkWriteTimes,chunkWriteTimes_arraysize);
-    }
+    doParsimUnpacking(b,this->writeTime);
 }
 
-int CompletingAWrite::getIteration() const
+double WriteCompleted::getWriteTime() const
 {
-    return this->iteration;
+    return this->writeTime;
 }
 
-void CompletingAWrite::setIteration(int iteration)
+void WriteCompleted::setWriteTime(double writeTime)
 {
-    this->iteration = iteration;
+    this->writeTime = writeTime;
 }
 
-int CompletingAWrite::getRemainingBytesToWrite() const
-{
-    return this->remainingBytesToWrite;
-}
-
-void CompletingAWrite::setRemainingBytesToWrite(int remainingBytesToWrite)
-{
-    this->remainingBytesToWrite = remainingBytesToWrite;
-}
-
-int CompletingAWrite::getProcessId() const
-{
-    return this->processId;
-}
-
-void CompletingAWrite::setProcessId(int processId)
-{
-    this->processId = processId;
-}
-
-size_t CompletingAWrite::getChunkWriteTimesArraySize() const
-{
-    return chunkWriteTimes_arraysize;
-}
-
-double CompletingAWrite::getChunkWriteTimes(size_t k) const
-{
-    if (k >= chunkWriteTimes_arraysize) throw omnetpp::cRuntimeError("Array of size %lu indexed by %lu", (unsigned long)chunkWriteTimes_arraysize, (unsigned long)k);
-    return this->chunkWriteTimes[k];
-}
-
-void CompletingAWrite::setChunkWriteTimesArraySize(size_t newSize)
-{
-    double *chunkWriteTimes2 = (newSize==0) ? nullptr : new double[newSize];
-    size_t minSize = chunkWriteTimes_arraysize < newSize ? chunkWriteTimes_arraysize : newSize;
-    for (size_t i = 0; i < minSize; i++)
-        chunkWriteTimes2[i] = this->chunkWriteTimes[i];
-    for (size_t i = minSize; i < newSize; i++)
-        chunkWriteTimes2[i] = 0;
-    delete [] this->chunkWriteTimes;
-    this->chunkWriteTimes = chunkWriteTimes2;
-    chunkWriteTimes_arraysize = newSize;
-}
-
-void CompletingAWrite::setChunkWriteTimes(size_t k, double chunkWriteTimes)
-{
-    if (k >= chunkWriteTimes_arraysize) throw omnetpp::cRuntimeError("Array of size %lu indexed by %lu", (unsigned long)chunkWriteTimes_arraysize, (unsigned long)k);
-    this->chunkWriteTimes[k] = chunkWriteTimes;
-}
-
-void CompletingAWrite::insertChunkWriteTimes(size_t k, double chunkWriteTimes)
-{
-    if (k > chunkWriteTimes_arraysize) throw omnetpp::cRuntimeError("Array of size %lu indexed by %lu", (unsigned long)chunkWriteTimes_arraysize, (unsigned long)k);
-    size_t newSize = chunkWriteTimes_arraysize + 1;
-    double *chunkWriteTimes2 = new double[newSize];
-    size_t i;
-    for (i = 0; i < k; i++)
-        chunkWriteTimes2[i] = this->chunkWriteTimes[i];
-    chunkWriteTimes2[k] = chunkWriteTimes;
-    for (i = k + 1; i < newSize; i++)
-        chunkWriteTimes2[i] = this->chunkWriteTimes[i-1];
-    delete [] this->chunkWriteTimes;
-    this->chunkWriteTimes = chunkWriteTimes2;
-    chunkWriteTimes_arraysize = newSize;
-}
-
-void CompletingAWrite::appendChunkWriteTimes(double chunkWriteTimes)
-{
-    insertChunkWriteTimes(chunkWriteTimes_arraysize, chunkWriteTimes);
-}
-
-void CompletingAWrite::eraseChunkWriteTimes(size_t k)
-{
-    if (k >= chunkWriteTimes_arraysize) throw omnetpp::cRuntimeError("Array of size %lu indexed by %lu", (unsigned long)chunkWriteTimes_arraysize, (unsigned long)k);
-    size_t newSize = chunkWriteTimes_arraysize - 1;
-    double *chunkWriteTimes2 = (newSize == 0) ? nullptr : new double[newSize];
-    size_t i;
-    for (i = 0; i < k; i++)
-        chunkWriteTimes2[i] = this->chunkWriteTimes[i];
-    for (i = k; i < newSize; i++)
-        chunkWriteTimes2[i] = this->chunkWriteTimes[i+1];
-    delete [] this->chunkWriteTimes;
-    this->chunkWriteTimes = chunkWriteTimes2;
-    chunkWriteTimes_arraysize = newSize;
-}
-
-class CompletingAWriteDescriptor : public omnetpp::cClassDescriptor
+class WriteCompletedDescriptor : public omnetpp::cClassDescriptor
 {
   private:
     mutable const char **propertyNames;
     enum FieldConstants {
-        FIELD_iteration,
-        FIELD_remainingBytesToWrite,
-        FIELD_processId,
-        FIELD_chunkWriteTimes,
+        FIELD_writeTime,
     };
   public:
-    CompletingAWriteDescriptor();
-    virtual ~CompletingAWriteDescriptor();
+    WriteCompletedDescriptor();
+    virtual ~WriteCompletedDescriptor();
 
     virtual bool doesSupport(omnetpp::cObject *obj) const override;
     virtual const char **getPropertyNames() const override;
@@ -347,24 +235,24 @@ class CompletingAWriteDescriptor : public omnetpp::cClassDescriptor
     virtual void setFieldStructValuePointer(omnetpp::any_ptr object, int field, int i, omnetpp::any_ptr ptr) const override;
 };
 
-Register_ClassDescriptor(CompletingAWriteDescriptor)
+Register_ClassDescriptor(WriteCompletedDescriptor)
 
-CompletingAWriteDescriptor::CompletingAWriteDescriptor() : omnetpp::cClassDescriptor(omnetpp::opp_typename(typeid(CompletingAWrite)), "omnetpp::cMessage")
+WriteCompletedDescriptor::WriteCompletedDescriptor() : omnetpp::cClassDescriptor(omnetpp::opp_typename(typeid(WriteCompleted)), "omnetpp::cMessage")
 {
     propertyNames = nullptr;
 }
 
-CompletingAWriteDescriptor::~CompletingAWriteDescriptor()
+WriteCompletedDescriptor::~WriteCompletedDescriptor()
 {
     delete[] propertyNames;
 }
 
-bool CompletingAWriteDescriptor::doesSupport(omnetpp::cObject *obj) const
+bool WriteCompletedDescriptor::doesSupport(omnetpp::cObject *obj) const
 {
-    return dynamic_cast<CompletingAWrite *>(obj)!=nullptr;
+    return dynamic_cast<WriteCompleted *>(obj)!=nullptr;
 }
 
-const char **CompletingAWriteDescriptor::getPropertyNames() const
+const char **WriteCompletedDescriptor::getPropertyNames() const
 {
     if (!propertyNames) {
         static const char *names[] = {  nullptr };
@@ -375,19 +263,19 @@ const char **CompletingAWriteDescriptor::getPropertyNames() const
     return propertyNames;
 }
 
-const char *CompletingAWriteDescriptor::getProperty(const char *propertyName) const
+const char *WriteCompletedDescriptor::getProperty(const char *propertyName) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     return base ? base->getProperty(propertyName) : nullptr;
 }
 
-int CompletingAWriteDescriptor::getFieldCount() const
+int WriteCompletedDescriptor::getFieldCount() const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
-    return base ? 4+base->getFieldCount() : 4;
+    return base ? 1+base->getFieldCount() : 1;
 }
 
-unsigned int CompletingAWriteDescriptor::getFieldTypeFlags(int field) const
+unsigned int WriteCompletedDescriptor::getFieldTypeFlags(int field) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -396,15 +284,12 @@ unsigned int CompletingAWriteDescriptor::getFieldTypeFlags(int field) const
         field -= base->getFieldCount();
     }
     static unsigned int fieldTypeFlags[] = {
-        FD_ISEDITABLE,    // FIELD_iteration
-        FD_ISEDITABLE,    // FIELD_remainingBytesToWrite
-        FD_ISEDITABLE,    // FIELD_processId
-        FD_ISARRAY | FD_ISEDITABLE | FD_ISRESIZABLE,    // FIELD_chunkWriteTimes
+        FD_ISEDITABLE,    // FIELD_writeTime
     };
-    return (field >= 0 && field < 4) ? fieldTypeFlags[field] : 0;
+    return (field >= 0 && field < 1) ? fieldTypeFlags[field] : 0;
 }
 
-const char *CompletingAWriteDescriptor::getFieldName(int field) const
+const char *WriteCompletedDescriptor::getFieldName(int field) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -413,26 +298,20 @@ const char *CompletingAWriteDescriptor::getFieldName(int field) const
         field -= base->getFieldCount();
     }
     static const char *fieldNames[] = {
-        "iteration",
-        "remainingBytesToWrite",
-        "processId",
-        "chunkWriteTimes",
+        "writeTime",
     };
-    return (field >= 0 && field < 4) ? fieldNames[field] : nullptr;
+    return (field >= 0 && field < 1) ? fieldNames[field] : nullptr;
 }
 
-int CompletingAWriteDescriptor::findField(const char *fieldName) const
+int WriteCompletedDescriptor::findField(const char *fieldName) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     int baseIndex = base ? base->getFieldCount() : 0;
-    if (strcmp(fieldName, "iteration") == 0) return baseIndex + 0;
-    if (strcmp(fieldName, "remainingBytesToWrite") == 0) return baseIndex + 1;
-    if (strcmp(fieldName, "processId") == 0) return baseIndex + 2;
-    if (strcmp(fieldName, "chunkWriteTimes") == 0) return baseIndex + 3;
+    if (strcmp(fieldName, "writeTime") == 0) return baseIndex + 0;
     return base ? base->findField(fieldName) : -1;
 }
 
-const char *CompletingAWriteDescriptor::getFieldTypeString(int field) const
+const char *WriteCompletedDescriptor::getFieldTypeString(int field) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -441,15 +320,12 @@ const char *CompletingAWriteDescriptor::getFieldTypeString(int field) const
         field -= base->getFieldCount();
     }
     static const char *fieldTypeStrings[] = {
-        "int",    // FIELD_iteration
-        "int",    // FIELD_remainingBytesToWrite
-        "int",    // FIELD_processId
-        "double",    // FIELD_chunkWriteTimes
+        "double",    // FIELD_writeTime
     };
-    return (field >= 0 && field < 4) ? fieldTypeStrings[field] : nullptr;
+    return (field >= 0 && field < 1) ? fieldTypeStrings[field] : nullptr;
 }
 
-const char **CompletingAWriteDescriptor::getFieldPropertyNames(int field) const
+const char **WriteCompletedDescriptor::getFieldPropertyNames(int field) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -462,7 +338,7 @@ const char **CompletingAWriteDescriptor::getFieldPropertyNames(int field) const
     }
 }
 
-const char *CompletingAWriteDescriptor::getFieldProperty(int field, const char *propertyName) const
+const char *WriteCompletedDescriptor::getFieldProperty(int field, const char *propertyName) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -475,7 +351,7 @@ const char *CompletingAWriteDescriptor::getFieldProperty(int field, const char *
     }
 }
 
-int CompletingAWriteDescriptor::getFieldArraySize(omnetpp::any_ptr object, int field) const
+int WriteCompletedDescriptor::getFieldArraySize(omnetpp::any_ptr object, int field) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -483,14 +359,13 @@ int CompletingAWriteDescriptor::getFieldArraySize(omnetpp::any_ptr object, int f
             return base->getFieldArraySize(object, field);
         field -= base->getFieldCount();
     }
-    CompletingAWrite *pp = omnetpp::fromAnyPtr<CompletingAWrite>(object); (void)pp;
+    WriteCompleted *pp = omnetpp::fromAnyPtr<WriteCompleted>(object); (void)pp;
     switch (field) {
-        case FIELD_chunkWriteTimes: return pp->getChunkWriteTimesArraySize();
         default: return 0;
     }
 }
 
-void CompletingAWriteDescriptor::setFieldArraySize(omnetpp::any_ptr object, int field, int size) const
+void WriteCompletedDescriptor::setFieldArraySize(omnetpp::any_ptr object, int field, int size) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -500,14 +375,13 @@ void CompletingAWriteDescriptor::setFieldArraySize(omnetpp::any_ptr object, int 
         }
         field -= base->getFieldCount();
     }
-    CompletingAWrite *pp = omnetpp::fromAnyPtr<CompletingAWrite>(object); (void)pp;
+    WriteCompleted *pp = omnetpp::fromAnyPtr<WriteCompleted>(object); (void)pp;
     switch (field) {
-        case FIELD_chunkWriteTimes: pp->setChunkWriteTimesArraySize(size); break;
-        default: throw omnetpp::cRuntimeError("Cannot set array size of field %d of class 'CompletingAWrite'", field);
+        default: throw omnetpp::cRuntimeError("Cannot set array size of field %d of class 'WriteCompleted'", field);
     }
 }
 
-const char *CompletingAWriteDescriptor::getFieldDynamicTypeString(omnetpp::any_ptr object, int field, int i) const
+const char *WriteCompletedDescriptor::getFieldDynamicTypeString(omnetpp::any_ptr object, int field, int i) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -515,13 +389,13 @@ const char *CompletingAWriteDescriptor::getFieldDynamicTypeString(omnetpp::any_p
             return base->getFieldDynamicTypeString(object,field,i);
         field -= base->getFieldCount();
     }
-    CompletingAWrite *pp = omnetpp::fromAnyPtr<CompletingAWrite>(object); (void)pp;
+    WriteCompleted *pp = omnetpp::fromAnyPtr<WriteCompleted>(object); (void)pp;
     switch (field) {
         default: return nullptr;
     }
 }
 
-std::string CompletingAWriteDescriptor::getFieldValueAsString(omnetpp::any_ptr object, int field, int i) const
+std::string WriteCompletedDescriptor::getFieldValueAsString(omnetpp::any_ptr object, int field, int i) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -529,17 +403,14 @@ std::string CompletingAWriteDescriptor::getFieldValueAsString(omnetpp::any_ptr o
             return base->getFieldValueAsString(object,field,i);
         field -= base->getFieldCount();
     }
-    CompletingAWrite *pp = omnetpp::fromAnyPtr<CompletingAWrite>(object); (void)pp;
+    WriteCompleted *pp = omnetpp::fromAnyPtr<WriteCompleted>(object); (void)pp;
     switch (field) {
-        case FIELD_iteration: return long2string(pp->getIteration());
-        case FIELD_remainingBytesToWrite: return long2string(pp->getRemainingBytesToWrite());
-        case FIELD_processId: return long2string(pp->getProcessId());
-        case FIELD_chunkWriteTimes: return double2string(pp->getChunkWriteTimes(i));
+        case FIELD_writeTime: return double2string(pp->getWriteTime());
         default: return "";
     }
 }
 
-void CompletingAWriteDescriptor::setFieldValueAsString(omnetpp::any_ptr object, int field, int i, const char *value) const
+void WriteCompletedDescriptor::setFieldValueAsString(omnetpp::any_ptr object, int field, int i, const char *value) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -549,17 +420,14 @@ void CompletingAWriteDescriptor::setFieldValueAsString(omnetpp::any_ptr object, 
         }
         field -= base->getFieldCount();
     }
-    CompletingAWrite *pp = omnetpp::fromAnyPtr<CompletingAWrite>(object); (void)pp;
+    WriteCompleted *pp = omnetpp::fromAnyPtr<WriteCompleted>(object); (void)pp;
     switch (field) {
-        case FIELD_iteration: pp->setIteration(string2long(value)); break;
-        case FIELD_remainingBytesToWrite: pp->setRemainingBytesToWrite(string2long(value)); break;
-        case FIELD_processId: pp->setProcessId(string2long(value)); break;
-        case FIELD_chunkWriteTimes: pp->setChunkWriteTimes(i,string2double(value)); break;
-        default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'CompletingAWrite'", field);
+        case FIELD_writeTime: pp->setWriteTime(string2double(value)); break;
+        default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'WriteCompleted'", field);
     }
 }
 
-omnetpp::cValue CompletingAWriteDescriptor::getFieldValue(omnetpp::any_ptr object, int field, int i) const
+omnetpp::cValue WriteCompletedDescriptor::getFieldValue(omnetpp::any_ptr object, int field, int i) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -567,17 +435,14 @@ omnetpp::cValue CompletingAWriteDescriptor::getFieldValue(omnetpp::any_ptr objec
             return base->getFieldValue(object,field,i);
         field -= base->getFieldCount();
     }
-    CompletingAWrite *pp = omnetpp::fromAnyPtr<CompletingAWrite>(object); (void)pp;
+    WriteCompleted *pp = omnetpp::fromAnyPtr<WriteCompleted>(object); (void)pp;
     switch (field) {
-        case FIELD_iteration: return pp->getIteration();
-        case FIELD_remainingBytesToWrite: return pp->getRemainingBytesToWrite();
-        case FIELD_processId: return pp->getProcessId();
-        case FIELD_chunkWriteTimes: return pp->getChunkWriteTimes(i);
-        default: throw omnetpp::cRuntimeError("Cannot return field %d of class 'CompletingAWrite' as cValue -- field index out of range?", field);
+        case FIELD_writeTime: return pp->getWriteTime();
+        default: throw omnetpp::cRuntimeError("Cannot return field %d of class 'WriteCompleted' as cValue -- field index out of range?", field);
     }
 }
 
-void CompletingAWriteDescriptor::setFieldValue(omnetpp::any_ptr object, int field, int i, const omnetpp::cValue& value) const
+void WriteCompletedDescriptor::setFieldValue(omnetpp::any_ptr object, int field, int i, const omnetpp::cValue& value) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -587,17 +452,14 @@ void CompletingAWriteDescriptor::setFieldValue(omnetpp::any_ptr object, int fiel
         }
         field -= base->getFieldCount();
     }
-    CompletingAWrite *pp = omnetpp::fromAnyPtr<CompletingAWrite>(object); (void)pp;
+    WriteCompleted *pp = omnetpp::fromAnyPtr<WriteCompleted>(object); (void)pp;
     switch (field) {
-        case FIELD_iteration: pp->setIteration(omnetpp::checked_int_cast<int>(value.intValue())); break;
-        case FIELD_remainingBytesToWrite: pp->setRemainingBytesToWrite(omnetpp::checked_int_cast<int>(value.intValue())); break;
-        case FIELD_processId: pp->setProcessId(omnetpp::checked_int_cast<int>(value.intValue())); break;
-        case FIELD_chunkWriteTimes: pp->setChunkWriteTimes(i,value.doubleValue()); break;
-        default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'CompletingAWrite'", field);
+        case FIELD_writeTime: pp->setWriteTime(value.doubleValue()); break;
+        default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'WriteCompleted'", field);
     }
 }
 
-const char *CompletingAWriteDescriptor::getFieldStructName(int field) const
+const char *WriteCompletedDescriptor::getFieldStructName(int field) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -610,7 +472,7 @@ const char *CompletingAWriteDescriptor::getFieldStructName(int field) const
     };
 }
 
-omnetpp::any_ptr CompletingAWriteDescriptor::getFieldStructValuePointer(omnetpp::any_ptr object, int field, int i) const
+omnetpp::any_ptr WriteCompletedDescriptor::getFieldStructValuePointer(omnetpp::any_ptr object, int field, int i) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -618,13 +480,13 @@ omnetpp::any_ptr CompletingAWriteDescriptor::getFieldStructValuePointer(omnetpp:
             return base->getFieldStructValuePointer(object, field, i);
         field -= base->getFieldCount();
     }
-    CompletingAWrite *pp = omnetpp::fromAnyPtr<CompletingAWrite>(object); (void)pp;
+    WriteCompleted *pp = omnetpp::fromAnyPtr<WriteCompleted>(object); (void)pp;
     switch (field) {
         default: return omnetpp::any_ptr(nullptr);
     }
 }
 
-void CompletingAWriteDescriptor::setFieldStructValuePointer(omnetpp::any_ptr object, int field, int i, omnetpp::any_ptr ptr) const
+void WriteCompletedDescriptor::setFieldStructValuePointer(omnetpp::any_ptr object, int field, int i, omnetpp::any_ptr ptr) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -634,9 +496,9 @@ void CompletingAWriteDescriptor::setFieldStructValuePointer(omnetpp::any_ptr obj
         }
         field -= base->getFieldCount();
     }
-    CompletingAWrite *pp = omnetpp::fromAnyPtr<CompletingAWrite>(object); (void)pp;
+    WriteCompleted *pp = omnetpp::fromAnyPtr<WriteCompleted>(object); (void)pp;
     switch (field) {
-        default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'CompletingAWrite'", field);
+        default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'WriteCompleted'", field);
     }
 }
 

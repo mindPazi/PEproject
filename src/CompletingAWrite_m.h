@@ -27,6 +27,7 @@ class CompletingAWrite;
  * {
  *     int iteration;
  *     int remainingBytesToWrite;
+ *     int processId;
  *     double chunkWriteTimes[];
  * }
  * </pre>
@@ -36,6 +37,7 @@ class CompletingAWrite : public ::omnetpp::cMessage
   protected:
     int iteration = 0;
     int remainingBytesToWrite = 0;
+    int processId = 0;
     double *chunkWriteTimes = nullptr;
     size_t chunkWriteTimes_arraysize = 0;
 
@@ -59,6 +61,9 @@ class CompletingAWrite : public ::omnetpp::cMessage
 
     virtual int getRemainingBytesToWrite() const;
     virtual void setRemainingBytesToWrite(int remainingBytesToWrite);
+
+    virtual int getProcessId() const;
+    virtual void setProcessId(int processId);
 
     virtual void setChunkWriteTimesArraySize(size_t size);
     virtual size_t getChunkWriteTimesArraySize() const;

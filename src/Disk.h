@@ -20,6 +20,7 @@
 #include <queue>
 #include "CompletingAWrite_m.h"
 #include "WriteRequest_m.h"
+#include "WriteCompleted_m.h"
 
 using namespace omnetpp;
 
@@ -54,6 +55,7 @@ class Disk : public cSimpleModule
     int getChunkSize(int bytesRemainingToWrite, int i);
     void writeAndSchedule(WriteRequest* nextReq);
     bool itsADifferentFile();
+    void sendWriteCompleted(int processId, double writeTime);
 };
 
 #endif

@@ -16,9 +16,6 @@
 //
 // TODO generated message class
 //
-message CompletingAWrite {
-    int iteration;
-    int remainingBytesToWrite;
-    int processId;
-    double chunkWriteTimes[];
+message WriteCompleted {
+    double writeTime;
 }
