@@ -1,11 +1,9 @@
-../out/clang-release/src/Disk.o: Disk.cc Disk.h \
+../out/clang-debug/src/Process.o: Process.cc Process.h \
   C:/Users/andrea/Downloads/omnetpp-6.1-windows-x86_64/omnetpp-6.1/include/omnetpp.h \
-  CompletingAWrite_m.h WriteRequest_m.h
+  WriteRequest_m.h
 
-Disk.h:
+Process.h:
 
 C:/Users/andrea/Downloads/omnetpp-6.1-windows-x86_64/omnetpp-6.1/include/omnetpp.h:
-
-CompletingAWrite_m.h:
 
 WriteRequest_m.h:

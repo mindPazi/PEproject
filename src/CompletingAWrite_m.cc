@@ -152,11 +152,8 @@ void doParsimUnpacking(omnetpp::cCommBuffer *, T& t)
 
 Register_Class(CompletingAWrite)
 
-CompletingAWrite::CompletingAWrite(int fileSize, int maxChunkSize , const char *name, short kind) : ::omnetpp::cMessage(name, kind)
+CompletingAWrite::CompletingAWrite(const char *name, short kind) : ::omnetpp::cMessage(name, kind)
 {
-    iteration = 0;
-    this->bytesRemainingToWrite = fileSize-maxChunkSize;
-    this->chunkWriteTimes.resize(fileSize/maxChunkSize);
 }
 
 CompletingAWrite::CompletingAWrite(const CompletingAWrite& other) : ::omnetpp::cMessage(other)
@@ -166,6 +163,7 @@ CompletingAWrite::CompletingAWrite(const CompletingAWrite& other) : ::omnetpp::c
 
 CompletingAWrite::~CompletingAWrite()
 {
+    delete [] this->chunkWriteTimes;
 }
 
 CompletingAWrite& CompletingAWrite::operator=(const CompletingAWrite& other)
@@ -180,6 +178,12 @@ void CompletingAWrite::copy(const CompletingAWrite& other)
 {
     this->iteration = other.iteration;
     this->remainingBytesToWrite = other.remainingBytesToWrite;
+    delete [] this->chunkWriteTimes;
+    this->chunkWriteTimes = (other.chunkWriteTimes_arraysize==0) ? nullptr : new double[other.chunkWriteTimes_arraysize];
+    chunkWriteTimes_arraysize = other.chunkWriteTimes_arraysize;
+    for (size_t i = 0; i < chunkWriteTimes_arraysize; i++) {
+        this->chunkWriteTimes[i] = other.chunkWriteTimes[i];
+    }
 }
 
 void CompletingAWrite::parsimPack(omnetpp::cCommBuffer *b) const
@@ -187,6 +191,8 @@ void CompletingAWrite::parsimPack(omnetpp::cCommBuffer *b) const
     ::omnetpp::cMessage::parsimPack(b);
     doParsimPacking(b,this->iteration);
     doParsimPacking(b,this->remainingBytesToWrite);
+    b->pack(chunkWriteTimes_arraysize);
+    doParsimArrayPacking(b,this->chunkWriteTimes,chunkWriteTimes_arraysize);
 }
 
 void CompletingAWrite::parsimUnpack(omnetpp::cCommBuffer *b)
@@ -194,6 +200,14 @@ void CompletingAWrite::parsimUnpack(omnetpp::cCommBuffer *b)
     ::omnetpp::cMessage::parsimUnpack(b);
     doParsimUnpacking(b,this->iteration);
     doParsimUnpacking(b,this->remainingBytesToWrite);
+    delete [] this->chunkWriteTimes;
+    b->unpack(chunkWriteTimes_arraysize);
+    if (chunkWriteTimes_arraysize == 0) {
+        this->chunkWriteTimes = nullptr;
+    } else {
+        this->chunkWriteTimes = new double[chunkWriteTimes_arraysize];
+        doParsimArrayUnpacking(b,this->chunkWriteTimes,chunkWriteTimes_arraysize);
+    }
 }
 
 int CompletingAWrite::getIteration() const
@@ -201,9 +215,9 @@ int CompletingAWrite::getIteration() const
     return this->iteration;
 }
 
-void CompletingAWrite::setIteration()
+void CompletingAWrite::setIteration(int iteration)
 {
-    this->iteration++;
+    this->iteration = iteration;
 }
 
 int CompletingAWrite::getRemainingBytesToWrite() const
@@ -216,20 +230,70 @@ void CompletingAWrite::setRemainingBytesToWrite(int remainingBytesToWrite)
     this->remainingBytesToWrite = remainingBytesToWrite;
 }
 
-void CompletingAWrite::addChunkWriteTime(double chunkWriteTime)
+size_t CompletingAWrite::getChunkWriteTimesArraySize() const
 {
-    int arraySize = sizeof(this->chunkWriteTimes) / sizeof(this->chunkWriteTimes[0]);
-    this->chunkWriteTimes[arraySize-1] = chunkWriteTime;
+    return chunkWriteTimes_arraysize;
 }
 
-double CompletingAWrite::getSumChunkWriteTimes()
+double CompletingAWrite::getChunkWriteTimes(size_t k) const
 {
-    int arraySize = sizeof(this->chunkWriteTimes) / sizeof(this->chunkWriteTimes[0]);
-    int sum=0;
-    for(int i=0; i<arraySize; i++)
-        sum *= this->chunkWriteTimes[i];
-    return sum;
+    if (k >= chunkWriteTimes_arraysize) throw omnetpp::cRuntimeError("Array of size %lu indexed by %lu", (unsigned long)chunkWriteTimes_arraysize, (unsigned long)k);
+    return this->chunkWriteTimes[k];
+}
 
+void CompletingAWrite::setChunkWriteTimesArraySize(size_t newSize)
+{
+    double *chunkWriteTimes2 = (newSize==0) ? nullptr : new double[newSize];
+    size_t minSize = chunkWriteTimes_arraysize < newSize ? chunkWriteTimes_arraysize : newSize;
+    for (size_t i = 0; i < minSize; i++)
+        chunkWriteTimes2[i] = this->chunkWriteTimes[i];
+    for (size_t i = minSize; i < newSize; i++)
+        chunkWriteTimes2[i] = 0;
+    delete [] this->chunkWriteTimes;
+    this->chunkWriteTimes = chunkWriteTimes2;
+    chunkWriteTimes_arraysize = newSize;
+}
+
+void CompletingAWrite::setChunkWriteTimes(size_t k, double chunkWriteTimes)
+{
+    if (k >= chunkWriteTimes_arraysize) throw omnetpp::cRuntimeError("Array of size %lu indexed by %lu", (unsigned long)chunkWriteTimes_arraysize, (unsigned long)k);
+    this->chunkWriteTimes[k] = chunkWriteTimes;
+}
+
+void CompletingAWrite::insertChunkWriteTimes(size_t k, double chunkWriteTimes)
+{
+    if (k > chunkWriteTimes_arraysize) throw omnetpp::cRuntimeError("Array of size %lu indexed by %lu", (unsigned long)chunkWriteTimes_arraysize, (unsigned long)k);
+    size_t newSize = chunkWriteTimes_arraysize + 1;
+    double *chunkWriteTimes2 = new double[newSize];
+    size_t i;
+    for (i = 0; i < k; i++)
+        chunkWriteTimes2[i] = this->chunkWriteTimes[i];
+    chunkWriteTimes2[k] = chunkWriteTimes;
+    for (i = k + 1; i < newSize; i++)
+        chunkWriteTimes2[i] = this->chunkWriteTimes[i-1];
+    delete [] this->chunkWriteTimes;
+    this->chunkWriteTimes = chunkWriteTimes2;
+    chunkWriteTimes_arraysize = newSize;
+}
+
+void CompletingAWrite::appendChunkWriteTimes(double chunkWriteTimes)
+{
+    insertChunkWriteTimes(chunkWriteTimes_arraysize, chunkWriteTimes);
+}
+
+void CompletingAWrite::eraseChunkWriteTimes(size_t k)
+{
+    if (k >= chunkWriteTimes_arraysize) throw omnetpp::cRuntimeError("Array of size %lu indexed by %lu", (unsigned long)chunkWriteTimes_arraysize, (unsigned long)k);
+    size_t newSize = chunkWriteTimes_arraysize - 1;
+    double *chunkWriteTimes2 = (newSize == 0) ? nullptr : new double[newSize];
+    size_t i;
+    for (i = 0; i < k; i++)
+        chunkWriteTimes2[i] = this->chunkWriteTimes[i];
+    for (i = k; i < newSize; i++)
+        chunkWriteTimes2[i] = this->chunkWriteTimes[i+1];
+    delete [] this->chunkWriteTimes;
+    this->chunkWriteTimes = chunkWriteTimes2;
+    chunkWriteTimes_arraysize = newSize;
 }
 
 class CompletingAWriteDescriptor : public omnetpp::cClassDescriptor
@@ -239,6 +303,7 @@ class CompletingAWriteDescriptor : public omnetpp::cClassDescriptor
     enum FieldConstants {
         FIELD_iteration,
         FIELD_remainingBytesToWrite,
+        FIELD_chunkWriteTimes,
     };
   public:
     CompletingAWriteDescriptor();
@@ -305,7 +370,7 @@ const char *CompletingAWriteDescriptor::getProperty(const char *propertyName) co
 int CompletingAWriteDescriptor::getFieldCount() const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
-    return base ? 2+base->getFieldCount() : 2;
+    return base ? 3+base->getFieldCount() : 3;
 }
 
 unsigned int CompletingAWriteDescriptor::getFieldTypeFlags(int field) const
@@ -319,8 +384,9 @@ unsigned int CompletingAWriteDescriptor::getFieldTypeFlags(int field) const
     static unsigned int fieldTypeFlags[] = {
         FD_ISEDITABLE,    // FIELD_iteration
         FD_ISEDITABLE,    // FIELD_remainingBytesToWrite
+        FD_ISARRAY | FD_ISEDITABLE | FD_ISRESIZABLE,    // FIELD_chunkWriteTimes
     };
-    return (field >= 0 && field < 2) ? fieldTypeFlags[field] : 0;
+    return (field >= 0 && field < 3) ? fieldTypeFlags[field] : 0;
 }
 
 const char *CompletingAWriteDescriptor::getFieldName(int field) const
@@ -334,8 +400,9 @@ const char *CompletingAWriteDescriptor::getFieldName(int field) const
     static const char *fieldNames[] = {
         "iteration",
         "remainingBytesToWrite",
+        "chunkWriteTimes",
     };
-    return (field >= 0 && field < 2) ? fieldNames[field] : nullptr;
+    return (field >= 0 && field < 3) ? fieldNames[field] : nullptr;
 }
 
 int CompletingAWriteDescriptor::findField(const char *fieldName) const
@@ -344,6 +411,7 @@ int CompletingAWriteDescriptor::findField(const char *fieldName) const
     int baseIndex = base ? base->getFieldCount() : 0;
     if (strcmp(fieldName, "iteration") == 0) return baseIndex + 0;
     if (strcmp(fieldName, "remainingBytesToWrite") == 0) return baseIndex + 1;
+    if (strcmp(fieldName, "chunkWriteTimes") == 0) return baseIndex + 2;
     return base ? base->findField(fieldName) : -1;
 }
 
@@ -358,8 +426,9 @@ const char *CompletingAWriteDescriptor::getFieldTypeString(int field) const
     static const char *fieldTypeStrings[] = {
         "int",    // FIELD_iteration
         "int",    // FIELD_remainingBytesToWrite
+        "double",    // FIELD_chunkWriteTimes
     };
-    return (field >= 0 && field < 2) ? fieldTypeStrings[field] : nullptr;
+    return (field >= 0 && field < 3) ? fieldTypeStrings[field] : nullptr;
 }
 
 const char **CompletingAWriteDescriptor::getFieldPropertyNames(int field) const
@@ -398,6 +467,7 @@ int CompletingAWriteDescriptor::getFieldArraySize(omnetpp::any_ptr object, int f
     }
     CompletingAWrite *pp = omnetpp::fromAnyPtr<CompletingAWrite>(object); (void)pp;
     switch (field) {
+        case FIELD_chunkWriteTimes: return pp->getChunkWriteTimesArraySize();
         default: return 0;
     }
 }
@@ -414,6 +484,7 @@ void CompletingAWriteDescriptor::setFieldArraySize(omnetpp::any_ptr object, int 
     }
     CompletingAWrite *pp = omnetpp::fromAnyPtr<CompletingAWrite>(object); (void)pp;
     switch (field) {
+        case FIELD_chunkWriteTimes: pp->setChunkWriteTimesArraySize(size); break;
         default: throw omnetpp::cRuntimeError("Cannot set array size of field %d of class 'CompletingAWrite'", field);
     }
 }
@@ -444,6 +515,7 @@ std::string CompletingAWriteDescriptor::getFieldValueAsString(omnetpp::any_ptr o
     switch (field) {
         case FIELD_iteration: return long2string(pp->getIteration());
         case FIELD_remainingBytesToWrite: return long2string(pp->getRemainingBytesToWrite());
+        case FIELD_chunkWriteTimes: return double2string(pp->getChunkWriteTimes(i));
         default: return "";
     }
 }
@@ -462,6 +534,7 @@ void CompletingAWriteDescriptor::setFieldValueAsString(omnetpp::any_ptr object, 
     switch (field) {
         case FIELD_iteration: pp->setIteration(string2long(value)); break;
         case FIELD_remainingBytesToWrite: pp->setRemainingBytesToWrite(string2long(value)); break;
+        case FIELD_chunkWriteTimes: pp->setChunkWriteTimes(i,string2double(value)); break;
         default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'CompletingAWrite'", field);
     }
 }
@@ -478,6 +551,7 @@ omnetpp::cValue CompletingAWriteDescriptor::getFieldValue(omnetpp::any_ptr objec
     switch (field) {
         case FIELD_iteration: return pp->getIteration();
         case FIELD_remainingBytesToWrite: return pp->getRemainingBytesToWrite();
+        case FIELD_chunkWriteTimes: return pp->getChunkWriteTimes(i);
         default: throw omnetpp::cRuntimeError("Cannot return field %d of class 'CompletingAWrite' as cValue -- field index out of range?", field);
     }
 }
@@ -496,6 +570,7 @@ void CompletingAWriteDescriptor::setFieldValue(omnetpp::any_ptr object, int fiel
     switch (field) {
         case FIELD_iteration: pp->setIteration(omnetpp::checked_int_cast<int>(value.intValue())); break;
         case FIELD_remainingBytesToWrite: pp->setRemainingBytesToWrite(omnetpp::checked_int_cast<int>(value.intValue())); break;
+        case FIELD_chunkWriteTimes: pp->setChunkWriteTimes(i,value.doubleValue()); break;
         default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'CompletingAWrite'", field);
     }
 }

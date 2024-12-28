@@ -27,16 +27,17 @@ class CompletingAWrite;
  * {
  *     int iteration;
  *     int remainingBytesToWrite;
+ *     double chunkWriteTimes[];
  * }
  * </pre>
  */
 class CompletingAWrite : public ::omnetpp::cMessage
 {
   protected:
-    int iteration;
-    int remainingBytesToWrite;
-    double chunkWriteTimes[];
-
+    int iteration = 0;
+    int remainingBytesToWrite = 0;
+    double *chunkWriteTimes = nullptr;
+    size_t chunkWriteTimes_arraysize = 0;
 
   private:
     void copy(const CompletingAWrite& other);
@@ -45,7 +46,7 @@ class CompletingAWrite : public ::omnetpp::cMessage
     bool operator==(const CompletingAWrite&) = delete;
 
   public:
-    CompletingAWrite(int fileSize, int maxChunkSize, const char *name=nullptr, short kind=0);
+    CompletingAWrite(const char *name=nullptr, short kind=0);
     CompletingAWrite(const CompletingAWrite& other);
     virtual ~CompletingAWrite();
     CompletingAWrite& operator=(const CompletingAWrite& other);
@@ -54,13 +55,19 @@ class CompletingAWrite : public ::omnetpp::cMessage
     virtual void parsimUnpack(omnetpp::cCommBuffer *b) override;
 
     virtual int getIteration() const;
-    virtual void setIteration();
-
-    virtual double getSumChunkWriteTimes() const;
-    virtual void addChunkWriteTimes(double chunkWriteTime);
+    virtual void setIteration(int iteration);
 
     virtual int getRemainingBytesToWrite() const;
     virtual void setRemainingBytesToWrite(int remainingBytesToWrite);
+
+    virtual void setChunkWriteTimesArraySize(size_t size);
+    virtual size_t getChunkWriteTimesArraySize() const;
+    virtual double getChunkWriteTimes(size_t k) const;
+    virtual void setChunkWriteTimes(size_t k, double chunkWriteTimes);
+    virtual void insertChunkWriteTimes(size_t k, double chunkWriteTimes);
+    [[deprecated]] void insertChunkWriteTimes(double chunkWriteTimes) {appendChunkWriteTimes(chunkWriteTimes);}
+    virtual void appendChunkWriteTimes(double chunkWriteTimes);
+    virtual void eraseChunkWriteTimes(size_t k);
 };
 
 inline void doParsimPacking(omnetpp::cCommBuffer *b, const CompletingAWrite& obj) {obj.parsimPack(b);}

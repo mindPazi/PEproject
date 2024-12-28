@@ -43,6 +43,8 @@ network DiskSimulation
             @display("p=300,100");
         }
     connections:
-        // Connessione da ogni processo al disco
+        // Connessione da ogni processo al disco per l'invio delle richieste di scrittura
         process[i].out --> disk.in;   
+        // Connessione nell'altro senso per l'invio della conferma di scrittura completata
+        disk.out --> process[i].in;
 }

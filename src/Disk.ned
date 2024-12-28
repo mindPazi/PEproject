@@ -25,6 +25,7 @@ simple Disk
         double seekTime; // S tempo per muovere la testina
         double interChunkDelay; // L tempo che intercorre tra due scrittura consecutive dello stesso file
         int maxChunkSize; // K
+        volatile double itsADifferentFileGenerator = default(uniform(0,10));
 
         @signal[writeFileTime];
         @statistic[writeFileTimeStats](source="writeFileTime"; record=mean,vector);
@@ -41,4 +42,5 @@ simple Disk
 
    	gates:
    		input in;
+   		output out;
 }

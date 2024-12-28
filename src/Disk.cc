@@ -43,7 +43,7 @@ void Disk::initialize() {
 
 void Disk::handleMessage(cMessage *msg) {
     if (dynamic_cast<WriteRequest*>(msg)) { // arriva una write request nella coda
-        WriteRequest *writeReq = check_and_cast<WriteRequest*>(msg);
+        WriteRequest *writeReq = check_and_cast<WriteRequest*>(msg); // todo: msg o packet?
 
         // tempo trascorso dell'ultima entrata o uscita di un processo dalla coda
         double timeSinceLastChange = (simTime() - lastQueueLengthChange_).dbl(); //resituisce un double facendo .dbl();
@@ -64,20 +64,21 @@ void Disk::handleMessage(cMessage *msg) {
         }
 
     } else if (dynamic_cast<CompletingAWrite*>(msg)) { // Completamento della scrittura
-
-        int chunkSize = Disk::getChunkSize(msg->getRemainingBytesToWrite(),
-                msg->getIteration());
+        CompletingAWrite* cwMsg = check_and_cast<CompletingAWrite*>(msg);
+        int remainingBytesToWrite = cwMsg->getRemainingBytesToWrite();
+        int currentIteration = cwMsg->getIteration();
+        int chunkSize = Disk::getChunkSize(remainingBytesToWrite,
+                currentIteration);
         double writeTime = interChunkDelay_ + chunkSize / writeSpeed_;
-        msg->setRemainingTimeToWrite(chunkSize); //aggiorna sottraendo i bit rimanenti al passo precedente quelli scritti ora
-        msg->setIteration(); // incrementa di uno;
-        if (chunkSize != 0){
-            msg->addChunkTime(writeTime);
+        cwMsg->setRemainingBytesToWrite(remainingBytesToWrite - chunkSize); //aggiorna sottraendo i bit rimanenti al passo precedente quelli scritti ora
+        cwMsg->setIteration(currentIteration + 1); // incrementa di uno;
+        if (chunkSize != 0) {
+            cwMsg->appendChunkWriteTimes(writeTime);
             emit(writeChunkTimeSignal_, writeTime);
-            scheduleAt(simTime() + writeTime, msg);
-        }
-        else {
-            cMessage newExtraxtionTimer = new cMessage();
-            emit(writeFileTimeSignal_, msg->getSumChunkWriteTimes());
+            scheduleAt(simTime() + writeTime, cwMsg);
+        } else {
+            cMessage* newExtraxtionTimer = new cMessage();
+            //emit(writeFileTimeSignal_, msg->getSumChunkWriteTimes());//todo: capire se il write time lo gestisce il proc
             delete msg;
             scheduleAt(simTime() + writeTime, newExtraxtionTimer);
         }
@@ -135,19 +136,28 @@ void Disk::writeAndSchedule(WriteRequest *nextReq) {
         writeTime = interChunkDelay_;
 
     //estraggo la dim del file
-    int fileSize = nextReq->getFileSize();
+    int fileSize = nextReq->getBytesToWrite();
     if (fileSize > maxChunkSize_) {
         //devo completare la scrittura in più step
-        CompletingAWrite *cwMsg = new CompletingAWrite(fileSize, maxChunkSize); // lo inizializza con i byte rimanenti da scrivere
-        writeTime += maxChunkSize / writeSpeed_; // in secondi. Chunk_size(i)={B-iK se B<K, k altrimenti}
-        cwMsg->addChunkTime(writeTime);
+        CompletingAWrite *cwMsg = new CompletingAWrite(); // lo inizializza con i byte rimanenti da scrivere
+        writeTime += maxChunkSize_ / writeSpeed_; // in secondi. Chunk_size(i)={B-iK se B<K, k altrimenti}
+        cwMsg->setRemainingBytesToWrite(fileSize - maxChunkSize_);
+        cwMsg->appendChunkWriteTimes(writeTime);
         emit(writeChunkTimeSignal_, writeTime);
         scheduleAt(simTime() + writeTime, cwMsg); // Programma il completamento della scrittura
     } else {
         writeTime += fileSize / writeSpeed_;
         emit(writeFileTimeSignal_, writeTime);
+        send(new cMessage(), "out");
         scheduleAt(simTime() + writeTime, new cMessage()); // gestisce l'estrazione di un processo dalla coda
     }
+}
+
+bool Disk::itsADifferentFile() {
+    // ritorna con prob del 10% che il file sia lo stesso del precedente
+    if (par("itsADifferentFileGenerator").doubleValue() <= 0.1)
+        return true;
+    return false;
 }
 
 void Disk::finish() {
@@ -156,7 +166,7 @@ void Disk::finish() {
             / par("simulationDuration").doubleValue()) * 100.0;
     emit(busyPercentage_, diskUtilization);
 
-    double averageQueueLength = totalQueueLengthTime
+    double averageQueueLength = totalQueueLengthTime_
             / par("simulationDuration").doubleValue();
     emit(queueLengthSignal_, averageQueueLength);
 

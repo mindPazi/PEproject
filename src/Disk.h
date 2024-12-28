@@ -18,7 +18,8 @@
 
 #include <omnetpp.h>
 #include <queue>
-#include <CompletingAWrite_m.h>
+#include "CompletingAWrite_m.h"
+#include "WriteRequest_m.h"
 
 using namespace omnetpp;
 
@@ -52,6 +53,7 @@ class Disk : public cSimpleModule
     virtual void finish() override;
     int getChunkSize(int bytesRemainingToWrite, int i);
     void writeAndSchedule(WriteRequest* nextReq);
+    bool itsADifferentFile();
 };
 
 #endif
