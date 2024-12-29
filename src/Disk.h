@@ -52,7 +52,7 @@ class Disk : public cSimpleModule
     virtual void initialize() override;
     virtual void handleMessage(cMessage *msg) override;
     virtual void finish() override;
-    int getChunkSize(int bytesRemainingToWrite, int i);
+    int getChunkSize(int bytesRemainingToWrite);
     void writeAndSchedule(WriteRequest* nextReq);
     bool itsADifferentFile();
     void sendWriteCompleted(int processId, double writeTime);

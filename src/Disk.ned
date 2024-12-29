@@ -41,6 +41,6 @@ simple Disk
         @statistic[busyPercentageStats](source="busyPercentage"; record=mean);
 
    	gates:
-   		input in;
-   		output out;
+   		input in[];
+       	output out[];
 }

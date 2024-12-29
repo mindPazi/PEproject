@@ -23,7 +23,7 @@ void Disk::initialize() {
     writeSpeed_ = par("writeSpeed").doubleValue(); // MB/s
     seekTime_ = par("seekTime").doubleValue() / 1000.0; // Convertito in secondi
     interChunkDelay_ = par("interChunkDelay").doubleValue() / 1000.0; // Convertito in secondi
-    maxChunkSize_ = par("chunkSize"); // K bytes
+    maxChunkSize_ = par("maxChunkSize"); // K bytes
 
     writeChunkTimeSignal_ = registerSignal("writeChunkTime");
     writeFileTimeSignal_ = registerSignal("writeFileTime");
@@ -67,20 +67,27 @@ void Disk::handleMessage(cMessage *msg) {
         CompletingAWrite* cwMsg = check_and_cast<CompletingAWrite*>(msg);
         int remainingBytesToWrite = cwMsg->getRemainingBytesToWrite();
         int currentIteration = cwMsg->getIteration();
-        int chunkSize = Disk::getChunkSize(remainingBytesToWrite,
-                currentIteration);
+
+        int chunkSize = Disk::getChunkSize(remainingBytesToWrite);
+        cwMsg->setIteration(currentIteration + 1);// incrementa di uno;
+        EV << "Disk has to write  "<<remainingBytesToWrite <<"\n";
+        EV << "Disk is doing iteration n "<<currentIteration <<"\n";
         double writeTime = interChunkDelay_ + chunkSize / writeSpeed_;
         cwMsg->setRemainingBytesToWrite(remainingBytesToWrite - chunkSize); //aggiorna sottraendo i bit rimanenti al passo precedente quelli scritti ora
-        cwMsg->setIteration(currentIteration + 1); // incrementa di uno;
+
         if (chunkSize != 0) {
             cwMsg->appendChunkWriteTimes(writeTime);
             emit(writeChunkTimeSignal_, writeTime);
+            EV << "Disk has been working for "<<writeTime <<"\n";
+            EV << "Disk has chunk size of  "<<chunkSize <<"\n";
             scheduleAt(simTime() + writeTime, cwMsg);
+
         } else {
             cMessage* newExtraxtionTimer = new cMessage();
             //emit(writeFileTimeSignal_, msg->getSumChunkWriteTimes());//todo: capire se il write time lo gestisce il proc
             sendWriteCompleted(cwMsg->getProcessId(), writeTime);
             delete msg;
+            EV << "Disk sent confirm and now is looking for a new message\n";
             scheduleAt(simTime() + writeTime, newExtraxtionTimer);
         }
 
@@ -116,12 +123,11 @@ void Disk::handleMessage(cMessage *msg) {
 }
 
 // calcola quanti bytes deve scrivere il processo
-int Disk::getChunkSize(int bytesRemainingToWrite, int i) {
-    if (bytesRemainingToWrite == 0)
-        return 0;
+int Disk::getChunkSize(int bytesRemainingToWrite) {
     if (bytesRemainingToWrite <= maxChunkSize_)
-        return bytesRemainingToWrite - i * maxChunkSize_;
-    return maxChunkSize_;
+        return bytesRemainingToWrite;
+    else
+        return maxChunkSize_;
 }
 
 void Disk::writeAndSchedule(WriteRequest *nextReq) {
@@ -142,8 +148,11 @@ void Disk::writeAndSchedule(WriteRequest *nextReq) {
         writeTime += maxChunkSize_ / writeSpeed_; // in secondi. Chunk_size(i)={B-iK se B<K, k altrimenti}
         cwMsg->setRemainingBytesToWrite(fileSize - maxChunkSize_);
         cwMsg->appendChunkWriteTimes(writeTime);
+        cwMsg->setIteration(1);
         cwMsg->setProcessId(nextReq->getProcessId());
         emit(writeChunkTimeSignal_, writeTime);
+        EV << "Disk iteration "<<cwMsg->getIteration() <<"\n";
+        EV << "Disk has left "<<cwMsg->getRemainingBytesToWrite() <<"\n";
         scheduleAt(simTime() + writeTime, cwMsg); // Programma il completamento della scrittura
     } else {
         writeTime += fileSize / writeSpeed_;

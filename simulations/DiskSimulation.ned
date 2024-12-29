@@ -16,7 +16,7 @@
 // DiskSimulation.ned
 package harddiskwriteoperations.simulations;
 
-import omnetpp.common.queue.Queue;
+//import omnetpp.common.queue.Queue;
 
 import harddiskwriteoperations.Process;
 
@@ -43,8 +43,11 @@ network DiskSimulation
             @display("p=300,100");
         }
     connections:
-        // Connessione da ogni processo al disco per l'invio delle richieste di scrittura
-        process[i].out --> disk.in;   
-        // Connessione nell'altro senso per l'invio della conferma di scrittura completata
-        disk.out --> process[i].in;
+    for i = 0..N-1 {
+    	// Connessione da ogni processo al disco per l'invio delle richieste di scrittura
+        process[i].out --> disk.in++;  
+        // Connessione nel verso opposto per l'invio della conferma di scrittura completata 
+        disk.out++ --> process[i].in;
+    }
+        
 }
