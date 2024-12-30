@@ -21,6 +21,7 @@ package harddiskwriteoperations;
 simple Disk
 {
     parameters:
+        double simulationDuration; // Durata della simulazione       
         double writeSpeed; // W velocità di scrittura del disco
         double seekTime; // S tempo per muovere la testina
         double interChunkDelay; // L tempo che intercorre tra due scrittura consecutive dello stesso file
@@ -28,17 +29,17 @@ simple Disk
         volatile double itsADifferentFileGenerator = default(uniform(0,10));
 
         @signal[writeFileTime];
-        @statistic[writeFileTimeStats](source="writeFileTime"; record=mean,vector);
+        @statistic[writeFileTimeStats](source=writeFileTime; record=stats,vector);
         
         @signal[writeChunkTime];
-        @statistic[writeChunkTimeStats](source="writeChunkTime"; record=mean,vector);
+        @statistic[writeChunkTimeStats](source="writeChunkTime"; record=stats,vector);
         
         // num of processes in the queue
         @signal[queueLength];
-        @statistic[queueLengthStats](source="queueLength"; record=mean);// è un solo valore
+        @statistic[queueLengthStats](source="queueLength"; record=stats);// è un solo valore
         
         @signal[busyPercentage];
-        @statistic[busyPercentageStats](source="busyPercentage"; record=mean);
+        @statistic[busyPercentageStats](source="busyPercentage"; record=stats);
 
    	gates:
    		input in[];

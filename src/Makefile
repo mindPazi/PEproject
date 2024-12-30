@@ -1,13 +1,13 @@
 #
-# OMNeT++/OMNEST Makefile for Hard disk write operations
+# OMNeT++/OMNEST Makefile for HardDiskWriteOperations
 #
 # This file was generated with the command:
-#  opp_makemake -f --deep
+#  opp_makemake -f -o HardDiskWriteOperations
 #
 
 # Name of target to be created (-o option)
 TARGET_DIR = .
-TARGET_NAME = Hard disk write operations$(D)
+TARGET_NAME = Hard$(D)
 TARGET = $(TARGET_NAME)$(EXE_SUFFIX)
 TARGET_IMPLIB = $(TARGET_NAME)$(IMPLIB_SUFFIX)
 TARGET_IMPDEF = $(TARGET_NAME)$(IMPDEF_SUFFIX)
@@ -33,11 +33,12 @@ PROJECTRELATIVE_PATH = src
 O = $(PROJECT_OUTPUT_DIR)/$(CONFIGNAME)/$(PROJECTRELATIVE_PATH)
 
 # Object files for local .cc, .msg and .sm files
-OBJS = $O/Disk.o $O/Process.o $O/CompletingAWrite_m.o $O/WriteRequest_m.o
+OBJS = $O/Disk.o $O/Process.o $O/CompletingAWrite_m.o $O/WriteCompleted_m.o $O/WriteRequest_m.o
 
 # Message files
 MSGFILES = \
     CompletingAWrite.msg \
+    WriteCompleted.msg \
     WriteRequest.msg
 
 # SM files
@@ -77,8 +78,6 @@ endif
 
 #------------------------------------------------------------------------------
 # User-supplied makefile fragment(s)
--include makefrag
-
 #------------------------------------------------------------------------------
 
 # Main target

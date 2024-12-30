@@ -44,7 +44,7 @@ class Disk : public cSimpleModule
     simsignal_t writeChunkTimeSignal_;
     simsignal_t queueLengthSignal_;
     double totalQueueLengthTime_;
-    simsignal_t busyPercentage_;
+    simsignal_t busyPercentageSignal_;
     simtime_t lastQueueLengthChange_;
 
 

@@ -13,7 +13,6 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-//todo: creare le classi WriteRequest
 #include "Disk.h"
 
 Define_Module(Disk);
@@ -28,7 +27,7 @@ void Disk::initialize() {
     writeChunkTimeSignal_ = registerSignal("writeChunkTime");
     writeFileTimeSignal_ = registerSignal("writeFileTime");
     queueLengthSignal_ = registerSignal("queueLength");
-    busyPercentage_ = registerSignal("busyPercentage");
+    busyPercentageSignal_ = registerSignal("busyPercentage");
 
     busy_ = false;
     totalBusyTime_ = 0.0;
@@ -37,17 +36,15 @@ void Disk::initialize() {
     maxQueueLength_ = 0;
     totalQueueLengthTime_ = 0.0; // tempo in cui la coda è piena
     lastQueueLengthChange_ = simTime();
-
-    // Inizializza mappa dei file
 }
 
 void Disk::handleMessage(cMessage *msg) {
     if (dynamic_cast<WriteRequest*>(msg)) { // arriva una write request nella coda
         WriteRequest *writeReq = check_and_cast<WriteRequest*>(msg); // todo: msg o packet?
-
+        EV <<"total busy time"<<totalBusyTime_<<"/n";
         // tempo trascorso dell'ultima entrata o uscita di un processo dalla coda
         double timeSinceLastChange = (simTime() - lastQueueLengthChange_).dbl(); //resituisce un double facendo .dbl();
-        totalQueueLengthTime_ += writeQueue.size() * timeSinceLastChange;
+        totalQueueLengthTime_ += writeQueue.size() * timeSinceLastChange; // lunghezza della coda pesata per il tempo che ha avuto quella lunghezza
         lastQueueLengthChange_ = simTime(); //istante dell'ultimo cambiamento nella coda
 
         if (!busy_) { // garantisce le write request che arrivano mentre sto elaborando una richiesta vadano in coda
@@ -64,27 +61,29 @@ void Disk::handleMessage(cMessage *msg) {
         }
 
     } else if (dynamic_cast<CompletingAWrite*>(msg)) { // Completamento della scrittura
-        CompletingAWrite* cwMsg = check_and_cast<CompletingAWrite*>(msg);
+        CompletingAWrite *cwMsg = check_and_cast<CompletingAWrite*>(msg);
         int remainingBytesToWrite = cwMsg->getRemainingBytesToWrite();
         int currentIteration = cwMsg->getIteration();
 
         int chunkSize = Disk::getChunkSize(remainingBytesToWrite);
-        cwMsg->setIteration(currentIteration + 1);// incrementa di uno;
-        EV << "Disk has to write  "<<remainingBytesToWrite <<"\n";
-        EV << "Disk is doing iteration n "<<currentIteration <<"\n";
+        cwMsg->setIteration(currentIteration + 1); // incrementa di uno;
+        EV << "Disk has to write  " << remainingBytesToWrite << "\n";
+        EV << "Disk is doing iteration n " << currentIteration << "\n";
         double writeTime = interChunkDelay_ + chunkSize / writeSpeed_;
         cwMsg->setRemainingBytesToWrite(remainingBytesToWrite - chunkSize); //aggiorna sottraendo i bit rimanenti al passo precedente quelli scritti ora
 
         if (chunkSize != 0) {
             cwMsg->appendChunkWriteTimes(writeTime);
             emit(writeChunkTimeSignal_, writeTime);
-            EV << "Disk has been working for "<<writeTime <<"\n";
-            EV << "Disk has chunk size of  "<<chunkSize <<"\n";
+            EV << "Disk has been working for " << writeTime << "\n";
+            EV << "Disk has chunk size of  " << chunkSize << "\n";
             scheduleAt(simTime() + writeTime, cwMsg);
 
         } else {
-            cMessage* newExtraxtionTimer = new cMessage();
-            //emit(writeFileTimeSignal_, msg->getSumChunkWriteTimes());//todo: capire se il write time lo gestisce il proc
+            cMessage *newExtraxtionTimer = new cMessage();
+            for (int i = 0; i < cwMsg->getChunkWriteTimesArraySize() - 1; i++)
+                writeTime += cwMsg->getChunkWriteTimes(i); // somma tutti i chunk times
+            emit(writeFileTimeSignal_, writeTime);
             sendWriteCompleted(cwMsg->getProcessId(), writeTime);
             delete msg;
             EV << "Disk sent confirm and now is looking for a new message\n";
@@ -105,11 +104,12 @@ void Disk::handleMessage(cMessage *msg) {
                     * timeSinceLastChange; // Prima di dequeue
             lastQueueLengthChange_ = simTime();
 
+            // Aggiorna il tempo di inizio occupazione
+            lastBusyStart_ = simTime();
+
             // scrive e schedula la prossima richiesta
             Disk::writeAndSchedule(nextReq);
 
-            // Aggiorna il tempo di inizio occupazione
-            lastBusyStart_ = simTime();
         } else {
             // Disco libero
             busy_ = false;
@@ -119,7 +119,7 @@ void Disk::handleMessage(cMessage *msg) {
         // Elimina il messaggio
         delete msg;
     } else
-        EV << "Incorrect message type" << "\n";
+        EV << "Incorrect message type." << "\n";
 }
 
 // calcola quanti bytes deve scrivere il processo
@@ -151,17 +151,16 @@ void Disk::writeAndSchedule(WriteRequest *nextReq) {
         cwMsg->setIteration(1);
         cwMsg->setProcessId(nextReq->getProcessId());
         emit(writeChunkTimeSignal_, writeTime);
-        EV << "Disk iteration "<<cwMsg->getIteration() <<"\n";
-        EV << "Disk has left "<<cwMsg->getRemainingBytesToWrite() <<"\n";
+        EV << "Disk iteration " << cwMsg->getIteration() << "\n";
+        EV << "Disk has left " << cwMsg->getRemainingBytesToWrite() << "\n";
         scheduleAt(simTime() + writeTime, cwMsg); // Programma il completamento della scrittura
     } else {
         writeTime += fileSize / writeSpeed_;
         emit(writeFileTimeSignal_, writeTime);
-        sendWriteCompleted(nextReq->getProcessId(), writeTime);   //invia il messaggio di scrittura completata
+        sendWriteCompleted(nextReq->getProcessId(), writeTime); //invia il messaggio di scrittura completata
         scheduleAt(simTime() + writeTime, new cMessage()); // gestisce l'estrazione di un processo dalla coda
     }
 }
-
 
 bool Disk::itsADifferentFile() {
     // ritorna con prob del 10% che il file sia lo stesso del precedente
@@ -170,12 +169,13 @@ bool Disk::itsADifferentFile() {
     return false;
 }
 
-void Disk::sendWriteCompleted(int processId, double writeTime){
+void Disk::sendWriteCompleted(int processId, double writeTime) {
 // Ottenere il modulo target usando il nome
-    std::string targetPath = "DiskSimulation.process[" + std::to_string(processId) + "]";
+    std::string targetPath = "DiskSimulation.process["
+            + std::to_string(processId) + "]";
     cModule *targetModule = getModuleByPath(targetPath.c_str());
 
-    WriteCompleted* writeCompleted = new WriteCompleted();
+    WriteCompleted *writeCompleted = new WriteCompleted();
     writeCompleted->setWriteTime(writeTime);
 
     if (targetModule != nullptr) {
@@ -186,9 +186,14 @@ void Disk::sendWriteCompleted(int processId, double writeTime){
 
 void Disk::finish() {
     // Calcolo delle metriche
-    double diskUtilization = (totalBusyTime_
-            / par("simulationDuration").doubleValue()) * 100.0;
-    emit(busyPercentage_, diskUtilization);
+    double simDuration = par("simulationDuration").doubleValue();
+    if (totalBusyTime_ == 0) // se totalBusyTime==0 vuoldire che il disco non è mai stato libero e la statistica non è stata aggiornata
+    {
+        totalBusyTime_ = simDuration;
+        EV <<"total busy time"<<totalBusyTime_;
+    }
+    double diskUtilization = (totalBusyTime_ / simDuration) * 100.0; // *100 per esprimere la percentuale
+    emit(busyPercentageSignal_, diskUtilization);
 
     double averageQueueLength = totalQueueLengthTime_
             / par("simulationDuration").doubleValue();
