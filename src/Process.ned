@@ -23,17 +23,17 @@ simple Process
 {
     parameters:
         int processId;
-        
+
         double meanInterArrivalDist;   // Media distribuzione esponenziale T
-        
+
         bool uniformWriteSizes = default(true);
         double meanWriteSizeForExponential; //Media distribuzione esponenziale B
         volatile double writeSizeForUniform = default(uniform(0,10)); //Range distribuzione uniforme B
-        
-        
+
+
         @signal[writeRequestResponseTime];
-        @statistic[meanResponseTime](source=writeRequestResponseTime; record=mean, vector);
+        @statistic[meanResponseTime](source=writeRequestResponseTime; record=mean,vector);
     gates:
-    	input in;
+        input in;
         output out;
 }

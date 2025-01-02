@@ -55,8 +55,7 @@ void Process::handleMessage(cMessage *msg) {
                       << responseTime << "\n";
             emit(writeRequestResponseTimeSignal_, responseTime);
         } else {
-            EV
-                      << "Unexpected response received with no matching request in queue.\n";
+            EV << "Unexpected response received with no matching request in queue.\n";
         }
         delete msg;
     }

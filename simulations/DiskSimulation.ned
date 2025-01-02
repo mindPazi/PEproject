@@ -26,27 +26,24 @@ network DiskSimulation
 {
     parameters:
         int N; // Numero di processi
-        bool uniformInterarrivals = default(true); // distribuzione T
-        bool uniformFileSizes = default(true); // distribuzione B
-        double maxInterarrivalTime @unit(s) = default(3s);  //Tmax
-        
+
     submodules:
         // Creazione di N processi
-        process[N]: Process{
+        process[N]: Process {
             parameters:
-                processId=index;
+                processId = index;
         }
-      
+
         // Modulo Disk
         disk: Disk {
-            @display("p=300,100");
+            @display("p=441,90");
         }
     connections:
-    for i = 0..N-1 {
-    	// Connessione da ogni processo al disco per l'invio delle richieste di scrittura
-        process[i].out --> disk.in++;  
-        // Connessione nel verso opposto per l'invio della conferma di scrittura completata 
-        disk.out++ --> process[i].in;
-    }
-        
+        for i=0..N-1 {
+            // Connessione da ogni processo al disco per l'invio delle richieste di scrittura
+            process[i].out --> disk.in++;
+            // Connessione nel verso opposto per l'invio della conferma di scrittura completata 
+            disk.out++ --> process[i].in;
+        }
+
 }
