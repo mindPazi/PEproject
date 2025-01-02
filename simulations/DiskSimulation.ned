@@ -26,7 +26,6 @@ network DiskSimulation
 {
     parameters:
         int N; // Numero di processi
-        double simulationDuration; // Durata della simulazione
         bool uniformInterarrivals = default(true); // distribuzione T
         bool uniformFileSizes = default(true); // distribuzione B
         double maxInterarrivalTime @unit(s) = default(3s);  //Tmax

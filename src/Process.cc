@@ -20,75 +20,83 @@ Define_Module(Process);
 //todo: capire come gestire la generazione dei tempi di interarrivo e della dim dei file
 //todo: nell'ini file servono 2 physical number gen, uno per file dim e l'altro per interarriv. time
 
-void Process::initialize()
-{
+void Process::initialize() {
     // inizializzazione dei parametri
     processId_ = par("processId").intValue();
 
     meanInterArrivalDistribution = par("meanInterArrivalDist").doubleValue();
 
     uniformWriteSizeDistribution = par("uniformWriteSizes").boolValue();
-    meanWriteSizeForExponential = par("meanWriteSizeForExponential").doubleValue();
-    waitingForResponse = false;
+    meanWriteSizeForExponential =
+            par("meanWriteSizeForExponential").doubleValue();
 
-    writeRequestResponseTimeSignal_ = registerSignal("writeRequestResponseTime");
+    writeRequestResponseTimeSignal_ = registerSignal(
+            "writeRequestResponseTime");
 
-
-    scheduleAt(simTime() + exponential(meanInterArrivalDistribution), new cMessage("sendNextRequest"));
+    scheduleAt(simTime() + exponential(meanInterArrivalDistribution),
+            new cMessage("sendNextRequest"));
 }
 
-void Process::handleMessage(cMessage *msg)
-{
+void Process::handleMessage(cMessage *msg) {
     if (msg->isSelfMessage()) {
-    // Se non stiamo aspettando una risposta, invia una nuova richiesta
-        if (!waitingForResponse) {
-            sendWriteRequest();
-            }
+        // Se non stiamo aspettando una risposta, invia una nuova richiesta
+        sendWriteRequest();
+        scheduleAt(simTime() + exponential(meanInterArrivalDistribution),
+                new cMessage("sendNextRequest"));
         delete msg;
-    }else {
+    } else {
         // Ricezione di una risposta
-        EV << "Process " << processId_ << " received a response.\n";
-
-        emit(writeRequestResponseTimeSignal_, (simTime() - lastTimeSent_));
-        waitingForResponse = false;
-        // Pianifica la prossima richiesta
-        scheduleAt(simTime() + exponential(meanInterArrivalDistribution), new cMessage("SendNextRequest"));
+        // Controlla se ci sono richieste in attesa nella coda
+        if (!sentRequests_.empty()) {
+            simtime_t sentTime = sentRequests_.front();
+            sentRequests_.pop();
+            simtime_t responseTime = simTime() - sentTime;
+            EV << "Process " << processId_ << " received a response after"
+                      << responseTime << "\n";
+            emit(writeRequestResponseTimeSignal_, responseTime);
+        } else {
+            EV
+                      << "Unexpected response received with no matching request in queue.\n";
+        }
         delete msg;
-   }
+    }
 }
 
 void Process::sendWriteRequest() {
-       // Crea un messaggio WriteRequest
-       WriteRequest *request = new WriteRequest("WriteRequest");
+    // Crea un messaggio WriteRequest
+    WriteRequest *request = new WriteRequest("WriteRequest");
 
-       // Calcola bytesToWrite in base alla distribuzione
-       int bytesToWrite;
-       if (uniformWriteSizeDistribution){
-           bytesToWrite = par("writeSizeForUniform");
-       } else {
-           bytesToWrite = int(exponential(meanWriteSizeForExponential));
-       }
+    // Calcola bytesToWrite in base alla distribuzione
+    int bytesToWrite;
+    if (uniformWriteSizeDistribution) {
+        bytesToWrite = par("writeSizeForUniform");
+    } else {
+        bytesToWrite = int(exponential(meanWriteSizeForExponential));
+    }
 
-       // Assegna i valori al messaggio
-       request->setBytesToWrite(bytesToWrite);
+    // Assegna i valori al messaggio
+    request->setBytesToWrite(bytesToWrite);
 
-       request->setFileName('A');
-       request->setProcessId(processId_);
+    request->setFileName('A');
+    request->setProcessId(processId_);
 
-       // Salva il tempo di invio
-       lastTimeSent_ = simTime();
+    // Salva il tempo di invio
+    sentRequests_.push(simTime());
 
-       // Invia il messaggio
-       send(request, "out");
-       EV << "Process " << processId_<< " sent a WriteRequest with bytesToWrite=" << bytesToWrite
-          << ", fileName=" << request->getFileName() << "\n";
+    // Invia il messaggio
+    send(request, "out");
+    EV << "Process " << processId_ << " sent a WriteRequest with bytesToWrite="
+              << bytesToWrite << ", fileName=" << request->getFileName()
+              << "\n";
 
-       waitingForResponse = true;
-   }
+}
 
-
-void Process::finish()
-{
+void Process::finish() {
     // Raccolta statistiche se necessario
+    while (!sentRequests_.empty()) {
+        EV << "Clearing unprocessed request sent at: " << sentRequests_.front()
+                  << "\n";
+        sentRequests_.pop();
+    }
 }
 

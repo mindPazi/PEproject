@@ -18,6 +18,7 @@
 
 #include <omnetpp.h>
 #include "WriteRequest_m.h"
+#include <queue>
 
 using namespace omnetpp;
 
@@ -28,20 +29,19 @@ class Process : public cSimpleModule
 {
 private:
     int processId_;
-    simtime_t lastTimeSent_;
-
     //Distribuzione di T
     double meanInterArrivalDistribution;
 
-
+    //Segnale per le statistiche
     simsignal_t writeRequestResponseTimeSignal_;
 
-    double meanWriteSizeForExponential;
     // Distribuzioni di B
+    double meanWriteSizeForExponential;
     bool uniformWriteSizeDistribution;
 
 
-    bool waitingForResponse;
+    std::queue<simtime_t> sentRequests_; // Coda per tenere traccia dei tempi di invio
+
 
 
   protected:

@@ -1,0 +1,176 @@
+version 3
+run General-0-20241231-16:01:12-18484
+attr configname General
+attr datetime 20241231-16:01:12
+attr datetimef 20241231-160112
+attr experiment General
+attr inifile omnetpp.ini
+attr iterationvars ""
+attr iterationvarsd ""
+attr iterationvarsf ""
+attr measurement ""
+attr network DiskSimulation
+attr processid 18484
+attr repetition 0
+attr replication #0
+attr resultdir results
+attr runnumber 0
+attr seedset 0
+config network DiskSimulation
+config cpu-time-limit 200s
+config sim-time-limit 10000s
+config *.N 10
+config *.uniformInterarrivals true
+config *.uniformFileSizes true
+config *.maxInterarrivalTime 3s
+config *.process[*].processId index
+config *.process[*].meanInterArrivalDist 3.0
+config *.process[*].uniformWriteSizes false
+config *.process[*].meanWriteSizeForExponential 60.0
+config *.process[*].writeSizeForUniform "uniform(0, 10)"
+config *.*.simulationDuration 10000
+config *.*.writeSpeed 100.0
+config *.*.seekTime 0.001
+config *.*.interChunkDelay 0.001
+config *.*.maxChunkSize 10
+
+par DiskSimulation.process[0] typename "\"harddiskwriteoperations.Process\""
+par DiskSimulation.process[0] processId 0
+par DiskSimulation.process[0] meanInterArrivalDist 3
+par DiskSimulation.process[0] uniformWriteSizes false
+par DiskSimulation.process[0] meanWriteSizeForExponential 60
+par DiskSimulation.process[0] writeSizeForUniform "uniform(0, 10)"
+scalar DiskSimulation.process[0] meanResponseTime:mean 8.3131480550269
+attr recordingmode mean
+attr source writeRequestResponseTime
+par DiskSimulation.process[1] typename "\"harddiskwriteoperations.Process\""
+par DiskSimulation.process[1] processId 1
+par DiskSimulation.process[1] meanInterArrivalDist 3
+par DiskSimulation.process[1] uniformWriteSizes false
+par DiskSimulation.process[1] meanWriteSizeForExponential 60
+par DiskSimulation.process[1] writeSizeForUniform "uniform(0, 10)"
+scalar DiskSimulation.process[1] meanResponseTime:mean 8.3099320110081
+attr recordingmode mean
+attr source writeRequestResponseTime
+par DiskSimulation.process[2] typename "\"harddiskwriteoperations.Process\""
+par DiskSimulation.process[2] processId 2
+par DiskSimulation.process[2] meanInterArrivalDist 3
+par DiskSimulation.process[2] uniformWriteSizes false
+par DiskSimulation.process[2] meanWriteSizeForExponential 60
+par DiskSimulation.process[2] writeSizeForUniform "uniform(0, 10)"
+scalar DiskSimulation.process[2] meanResponseTime:mean 8.2816282446738
+attr recordingmode mean
+attr source writeRequestResponseTime
+par DiskSimulation.process[3] typename "\"harddiskwriteoperations.Process\""
+par DiskSimulation.process[3] processId 3
+par DiskSimulation.process[3] meanInterArrivalDist 3
+par DiskSimulation.process[3] uniformWriteSizes false
+par DiskSimulation.process[3] meanWriteSizeForExponential 60
+par DiskSimulation.process[3] writeSizeForUniform "uniform(0, 10)"
+scalar DiskSimulation.process[3] meanResponseTime:mean 8.3003665158498
+attr recordingmode mean
+attr source writeRequestResponseTime
+par DiskSimulation.process[4] typename "\"harddiskwriteoperations.Process\""
+par DiskSimulation.process[4] processId 4
+par DiskSimulation.process[4] meanInterArrivalDist 3
+par DiskSimulation.process[4] uniformWriteSizes false
+par DiskSimulation.process[4] meanWriteSizeForExponential 60
+par DiskSimulation.process[4] writeSizeForUniform "uniform(0, 10)"
+scalar DiskSimulation.process[4] meanResponseTime:mean 8.326786335805
+attr recordingmode mean
+attr source writeRequestResponseTime
+par DiskSimulation.process[5] typename "\"harddiskwriteoperations.Process\""
+par DiskSimulation.process[5] processId 5
+par DiskSimulation.process[5] meanInterArrivalDist 3
+par DiskSimulation.process[5] uniformWriteSizes false
+par DiskSimulation.process[5] meanWriteSizeForExponential 60
+par DiskSimulation.process[5] writeSizeForUniform "uniform(0, 10)"
+scalar DiskSimulation.process[5] meanResponseTime:mean 8.3441010518434
+attr recordingmode mean
+attr source writeRequestResponseTime
+par DiskSimulation.process[6] typename "\"harddiskwriteoperations.Process\""
+par DiskSimulation.process[6] processId 6
+par DiskSimulation.process[6] meanInterArrivalDist 3
+par DiskSimulation.process[6] uniformWriteSizes false
+par DiskSimulation.process[6] meanWriteSizeForExponential 60
+par DiskSimulation.process[6] writeSizeForUniform "uniform(0, 10)"
+scalar DiskSimulation.process[6] meanResponseTime:mean 8.2425805812329
+attr recordingmode mean
+attr source writeRequestResponseTime
+par DiskSimulation.process[7] typename "\"harddiskwriteoperations.Process\""
+par DiskSimulation.process[7] processId 7
+par DiskSimulation.process[7] meanInterArrivalDist 3
+par DiskSimulation.process[7] uniformWriteSizes false
+par DiskSimulation.process[7] meanWriteSizeForExponential 60
+par DiskSimulation.process[7] writeSizeForUniform "uniform(0, 10)"
+scalar DiskSimulation.process[7] meanResponseTime:mean 8.2822992876523
+attr recordingmode mean
+attr source writeRequestResponseTime
+par DiskSimulation.process[8] typename "\"harddiskwriteoperations.Process\""
+par DiskSimulation.process[8] processId 8
+par DiskSimulation.process[8] meanInterArrivalDist 3
+par DiskSimulation.process[8] uniformWriteSizes false
+par DiskSimulation.process[8] meanWriteSizeForExponential 60
+par DiskSimulation.process[8] writeSizeForUniform "uniform(0, 10)"
+scalar DiskSimulation.process[8] meanResponseTime:mean 8.21616642101
+attr recordingmode mean
+attr source writeRequestResponseTime
+par DiskSimulation.process[9] typename "\"harddiskwriteoperations.Process\""
+par DiskSimulation.process[9] processId 9
+par DiskSimulation.process[9] meanInterArrivalDist 3
+par DiskSimulation.process[9] uniformWriteSizes false
+par DiskSimulation.process[9] meanWriteSizeForExponential 60
+par DiskSimulation.process[9] writeSizeForUniform "uniform(0, 10)"
+scalar DiskSimulation.process[9] meanResponseTime:mean 8.3107182782086
+attr recordingmode mean
+attr source writeRequestResponseTime
+par DiskSimulation.disk typename "\"harddiskwriteoperations.Disk\""
+par DiskSimulation.disk simulationDuration 10000
+par DiskSimulation.disk writeSpeed 100
+par DiskSimulation.disk seekTime 0.001
+par DiskSimulation.disk interChunkDelay 0.001
+par DiskSimulation.disk maxChunkSize 10
+par DiskSimulation.disk itsADifferentFileGenerator "uniform(0, 10)"
+scalar DiskSimulation.disk busyPercentageStats:mean 94.4704544
+attr recordingmode mean
+attr source busyPercentage
+scalar DiskSimulation.disk queueLengthTimeStats:mean 7.3593236946651
+attr recordingmode mean
+attr source queueLengthTime
+statistic DiskSimulation.disk queueLengthStats:stats
+field count 17750
+field mean 6.4205633802817
+field stddev 1.7746674961079
+field min 0
+field max 10
+field sum 113965
+field sqrsum 787619
+attr recordingmode stats
+attr source queueLength
+statistic DiskSimulation.disk writeChunkTimeStats:stats
+field count 55023
+field mean 0.093722534630867
+field stddev 0.019135775842722
+field min 0.010001
+field max 0.100001
+field sum 5156.8950229942
+field sqrsum 503.46511373516
+attr recordingmode stats
+attr source writeChunkTime
+statistic DiskSimulation.disk writeFileTimeStats:stats
+field count 8886
+field mean 0.54421635404007
+field stddev 0.57238415865972
+field min 1e-06
+field max 6.200063
+field sum 4835.9065220001
+field sqrsum 5542.7153247581
+attr recordingmode stats
+attr source writeFileTime
+par DiskSimulation typename "\"harddiskwriteoperations.simulations.DiskSimulation\""
+par DiskSimulation N 10
+par DiskSimulation uniformInterarrivals true
+par DiskSimulation uniformFileSizes true
+par DiskSimulation maxInterarrivalTime 3s
+attr unit s
+

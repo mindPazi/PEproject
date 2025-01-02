@@ -27,13 +27,13 @@ void Disk::initialize() {
     writeChunkTimeSignal_ = registerSignal("writeChunkTime");
     writeFileTimeSignal_ = registerSignal("writeFileTime");
     queueLengthSignal_ = registerSignal("queueLength");
+    queueLengthTimeSignal_ = registerSignal("queueLengthTime");
     busyPercentageSignal_ = registerSignal("busyPercentage");
 
     busy_ = false;
     totalBusyTime_ = 0.0;
     lastBusyStart_ = 0.0;
 
-    maxQueueLength_ = 0;
     totalQueueLengthTime_ = 0.0; // tempo in cui la coda è piena
     lastQueueLengthChange_ = simTime();
 }
@@ -41,11 +41,7 @@ void Disk::initialize() {
 void Disk::handleMessage(cMessage *msg) {
     if (dynamic_cast<WriteRequest*>(msg)) { // arriva una write request nella coda
         WriteRequest *writeReq = check_and_cast<WriteRequest*>(msg); // todo: msg o packet?
-        EV <<"total busy time"<<totalBusyTime_<<"/n";
         // tempo trascorso dell'ultima entrata o uscita di un processo dalla coda
-        double timeSinceLastChange = (simTime() - lastQueueLengthChange_).dbl(); //resituisce un double facendo .dbl();
-        totalQueueLengthTime_ += writeQueue.size() * timeSinceLastChange; // lunghezza della coda pesata per il tempo che ha avuto quella lunghezza
-        lastQueueLengthChange_ = simTime(); //istante dell'ultimo cambiamento nella coda
 
         if (!busy_) { // garantisce le write request che arrivano mentre sto elaborando una richiesta vadano in coda
             // Il disco è libero, inizia immediatamente la scrittura
@@ -55,9 +51,11 @@ void Disk::handleMessage(cMessage *msg) {
         } else {
             // Disco occupato, aggiungi alla coda
             writeQueue.push(writeReq);
-            // Aggiorna la lunghezza massima della coda
-            if (writeQueue.size() > maxQueueLength_)
-                maxQueueLength_ = writeQueue.size();
+            double timeSinceLastChange =
+                    (simTime() - lastQueueLengthChange_).dbl(); //resituisce un double facendo .dbl();
+            totalQueueLengthTime_ += writeQueue.size() * timeSinceLastChange; // lunghezza della coda pesata per il tempo che ha avuto quella lunghezza
+            lastQueueLengthChange_ = simTime(); //istante dell'ultimo cambiamento nella coda
+            emit(queueLengthSignal_, writeQueue.size());
         }
 
     } else if (dynamic_cast<CompletingAWrite*>(msg)) { // Completamento della scrittura
@@ -86,8 +84,9 @@ void Disk::handleMessage(cMessage *msg) {
             emit(writeFileTimeSignal_, writeTime);
             sendWriteCompleted(cwMsg->getProcessId(), writeTime);
             delete msg;
-            EV << "Disk sent confirm and now is looking for a new message\n";
-            scheduleAt(simTime() + writeTime, newExtraxtionTimer);
+            EV << "Disk worked for " << writeTime
+                      << " and sent confirm,now is looking for a new message\n";
+            scheduleAt(simTime(), newExtraxtionTimer); // invia subito il messaggio di nuova estrazione
         }
 
     } else if (dynamic_cast<cMessage*>(msg)) { //estrazione di un processo dalla coda
@@ -96,6 +95,9 @@ void Disk::handleMessage(cMessage *msg) {
         if (!writeQueue.empty()) {
             WriteRequest *nextReq = writeQueue.front();
             writeQueue.pop();
+            EV << "Queue length: " << writeQueue.size() << endl;
+
+            emit(queueLengthSignal_, writeQueue.size());
 
             // Aggiorna le metriche della coda
             double timeSinceLastChange =
@@ -103,9 +105,6 @@ void Disk::handleMessage(cMessage *msg) {
             totalQueueLengthTime_ += (writeQueue.size() + 1)
                     * timeSinceLastChange; // Prima di dequeue
             lastQueueLengthChange_ = simTime();
-
-            // Aggiorna il tempo di inizio occupazione
-            lastBusyStart_ = simTime();
 
             // scrive e schedula la prossima richiesta
             Disk::writeAndSchedule(nextReq);
@@ -186,18 +185,15 @@ void Disk::sendWriteCompleted(int processId, double writeTime) {
 
 void Disk::finish() {
     // Calcolo delle metriche
-    double simDuration = par("simulationDuration").doubleValue();
+    double simDuration = simTime().dbl();
     if (totalBusyTime_ == 0) // se totalBusyTime==0 vuoldire che il disco non è mai stato libero e la statistica non è stata aggiornata
-    {
         totalBusyTime_ = simDuration;
-        EV <<"total busy time"<<totalBusyTime_;
-    }
+
     double diskUtilization = (totalBusyTime_ / simDuration) * 100.0; // *100 per esprimere la percentuale
     emit(busyPercentageSignal_, diskUtilization);
 
-    double averageQueueLength = totalQueueLengthTime_
-            / par("simulationDuration").doubleValue();
-    emit(queueLengthSignal_, averageQueueLength);
+    double averageQueueLength = totalQueueLengthTime_ / simDuration;
+    emit(queueLengthTimeSignal_, averageQueueLength);
 
     //elimina le richieste in coda
     while (!writeQueue.empty()) {

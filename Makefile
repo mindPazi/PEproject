@@ -1,8 +1,8 @@
 #
-# OMNeT++/OMNEST Makefile for Hard
+# OMNeT++/OMNEST Makefile for HardDiskWriteOperations
 #
 # This file was generated with the command:
-#  opp_makemake -f -o Hard
+#  opp_makemake -f
 #
 
 # Name of target to be created (-o option)
