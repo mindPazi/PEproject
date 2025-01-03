@@ -1,0 +1,71 @@
+[33mcommit a6c4938d1b031e9001ef9373695a16bb46d05593[m[33m ([m[1;36mHEAD -> [m[1;32mmain[m[33m)[m
+Author: Andrea I <andreinno228@gmail.com>
+Date:   Thu Jan 2 20:03:36 2025 +0100
+
+    risultati simulazioni+ini fixato
+
+[33mcommit cc6482a10420cec4a286cfcff1ab8245dbab809a[m[33m ([m[1;31morigin/main[m[33m)[m
+Author: Andrea I <andreinno228@gmail.com>
+Date:   Thu Jan 2 16:17:39 2025 +0100
+
+    ini configurato
+
+[33mcommit bc6de7f9dc8486ae40cda5e2e620c435d6519c23[m
+Author: Andrea I <andreinno228@gmail.com>
+Date:   Thu Jan 2 11:09:20 2025 +0100
+
+    tutto fixato
+
+[33mcommit 23d4cdcf9211f89e536c78a64a85b2fd4cd6f33c[m
+Author: Andrea I <andreinno228@gmail.com>
+Date:   Mon Dec 30 17:58:16 2024 +0100
+
+    disk stats and ini fixed
+
+[33mcommit 08ca64d3e6914eb260cc4978cc3f4b65a7849709[m
+Author: Gabriele Di Lonardo <gabrieledilonardo01@gmail.com>
+Date:   Sun Dec 29 18:48:17 2024 +0100
+
+    Simulazione che parte (processi inviano una richiesta per volta)
+
+[33mcommit 3a1c9aef66cdb09b3636165265fe70f40c9cee78[m
+Author: Andrea I <andreinno228@gmail.com>
+Date:   Sat Dec 28 19:00:15 2024 +0100
+
+    disk corretto
+
+[33mcommit c854b594d6a548f84d6e7e0f8d2dcf68df1e4a2c[m
+Author: Gabriele Di Lonardo <gabrieledilonardo01@gmail.com>
+Date:   Sat Dec 28 18:13:55 2024 +0100
+
+    Aggiustato
+
+[33mcommit 2ec3b03a446f88b2b1691d4f5018887bca80ca4b[m
+Author: Andrea I <andreinno228@gmail.com>
+Date:   Sat Dec 28 16:43:09 2024 +0100
+
+    disco builda
+
+[33mcommit fc56ece1fc46abd664d9ccf3db74ee8cff16ebb4[m
+Author: Gabriele Di Lonardo <gabrieledilonardo01@gmail.com>
+Date:   Fri Dec 27 23:46:40 2024 +0100
+
+    Aggiunti WriteRequest e Process
+
+[33mcommit e7ffb4518fd2ca71310d0c9e5f50c5fd8e6e00cc[m
+Author: Andrea I <andreinno2218@gmail.com>
+Date:   Fri Dec 27 16:19:27 2024 +0100
+
+    statistics updated
+
+[33mcommit ff5b34d53469123de793d7b3ca039d01b7cb7ae7[m
+Author: Andrea I <andreinno2218@gmail.com>
+Date:   Thu Dec 26 19:36:09 2024 +0100
+
+    disk aggiornato
+
+[33mcommit 2a99399e33736f8a31f4ac3e13358848474bbfb5[m
+Author: andreainno22 <andrea.innocenti12@stud.unifi.it>
+Date:   Tue Dec 24 17:31:44 2024 +0100
+
+    first commit

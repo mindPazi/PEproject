@@ -22,8 +22,8 @@ simple Disk
 {
     parameters:
         double writeSpeed; // W velocità di scrittura del disco
-        double seekTime; // S tempo per muovere la testina
-        double interChunkDelay; // L tempo che intercorre tra due scrittura consecutive dello stesso file
+        double seekTime @unit(ms); // S tempo per muovere la testina
+        double interChunkDelay @unit(ms); // L tempo che intercorre tra due scrittura consecutive dello stesso file
         int maxChunkSize; // K
         volatile double itsADifferentFileGenerator = default(uniform(0,10));
 

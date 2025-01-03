@@ -152,11 +152,14 @@ void Disk::writeAndSchedule(WriteRequest *nextReq) {
         emit(writeChunkTimeSignal_, writeTime);
         EV << "Disk iteration " << cwMsg->getIteration() << "\n";
         EV << "Disk has left " << cwMsg->getRemainingBytesToWrite() << "\n";
+        delete nextReq;
         scheduleAt(simTime() + writeTime, cwMsg); // Programma il completamento della scrittura
+
     } else {
         writeTime += fileSize / writeSpeed_;
         emit(writeFileTimeSignal_, writeTime);
         sendWriteCompleted(nextReq->getProcessId(), writeTime); //invia il messaggio di scrittura completata
+        delete nextReq;
         scheduleAt(simTime() + writeTime, new cMessage()); // gestisce l'estrazione di un processo dalla coda
     }
 }
