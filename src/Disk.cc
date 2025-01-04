@@ -20,6 +20,7 @@ Define_Module(Disk);
 //todo: capire se registrare anche: WaitingTime, tempo di risposta = writeFileTime+WaitingTime, througput,
 void Disk::initialize() {
     writeSpeed_ = par("writeSpeed").doubleValue(); // MB/s
+    EV<<"write speed: "<<writeSpeed_<<endl;
     seekTime_ = par("seekTime").doubleValue() / 1000.0; // Convertito in secondi
     interChunkDelay_ = par("interChunkDelay").doubleValue() / 1000.0; // Convertito in secondi
     maxChunkSize_ = par("maxChunkSize"); // K bytes

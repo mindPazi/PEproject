@@ -21,10 +21,10 @@ package harddiskwriteoperations;
 simple Disk
 {
     parameters:
-        double writeSpeed; // W velocità di scrittura del disco
+        double writeSpeed @unit(kbps); // W velocità di scrittura del disco
         double seekTime @unit(ms); // S tempo per muovere la testina
         double interChunkDelay @unit(ms); // L tempo che intercorre tra due scrittura consecutive dello stesso file
-        int maxChunkSize; // K
+        int maxChunkSize @unit(kB); // K
         volatile double itsADifferentFileGenerator = default(uniform(0,10));
 
         @signal[writeFileTime];

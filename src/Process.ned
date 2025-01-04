@@ -24,11 +24,11 @@ simple Process
     parameters:
         int processId;
 
-        double meanInterArrivalDist @unit(ms);   // Media distribuzione esponenziale T
+        double meanInterArrivalDist @unit(s);   // Media distribuzione esponenziale T
 
         bool uniformWriteSizes = default(true);
-        double meanWriteSizeForExponential; //Media distribuzione esponenziale B
-        volatile int writeSizeForUniform = default(intuniform(0,100000)); //Range distribuzione uniforme B
+        double meanWriteSizeForExponential @unit(kB); //Media distribuzione esponenziale B
+        volatile int writeSizeForUniform @unit(kB) = default(intuniform(0,100000)); //Range distribuzione uniforme B
 
         @signal[writeRequestResponseTime];
         @statistic[meanResponseTime](source=writeRequestResponseTime; record=mean,vector);
