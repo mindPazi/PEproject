@@ -33,15 +33,18 @@ void Process::initialize() {
     writeRequestResponseTimeSignal_ = registerSignal(
             "writeRequestResponseTime");
 
-    scheduleAt(simTime() + exponential(meanInterArrivalDistribution),
-            new cMessage("sendNextRequest"));
+    simtime_t nextDeparture = exponential(meanInterArrivalDistribution, 2);
+    // usa il rng 2
+    EV<<"using rng2 for departure: "<<nextDeparture<<endl;
+    scheduleAt(simTime() + nextDeparture, new cMessage("sendNextRequest"));
 }
 
 void Process::handleMessage(cMessage *msg) {
     if (msg->isSelfMessage()) {
         // Se non stiamo aspettando una risposta, invia una nuova richiesta
         sendWriteRequest();
-        scheduleAt(simTime() + exponential(meanInterArrivalDistribution),
+        // usa il rng 2
+        scheduleAt(simTime() + exponential(meanInterArrivalDistribution, 2),
                 new cMessage("sendNextRequest"));
         delete msg;
     } else {
@@ -55,7 +58,8 @@ void Process::handleMessage(cMessage *msg) {
                       << responseTime << "\n";
             emit(writeRequestResponseTimeSignal_, responseTime);
         } else {
-            EV << "Unexpected response received with no matching request in queue.\n";
+            EV
+                      << "Unexpected response received with no matching request in queue.\n";
         }
         delete msg;
     }
@@ -68,9 +72,14 @@ void Process::sendWriteRequest() {
     // Calcola bytesToWrite in base alla distribuzione
     int bytesToWrite;
     if (uniformWriteSizeDistribution) {
-        bytesToWrite = par("writeSizeForUniform");
+        // usa il rng 0
+        bytesToWrite = par("writeSizeForUniform").intValue();
+        EV << "bytes to write uniform using rng0: "<<bytesToWrite<<endl;
     } else {
-        bytesToWrite = int(exponential(meanWriteSizeForExponential));
+        //usa il rng 1
+        bytesToWrite = int(exponential(meanWriteSizeForExponential, 1));
+        EV << "bytes to write exp using rng1: "<<bytesToWrite<<endl;
+
     }
 
     // Assegna i valori al messaggio

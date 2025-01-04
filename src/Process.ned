@@ -28,11 +28,7 @@ simple Process
 
         bool uniformWriteSizes = default(true);
         double meanWriteSizeForExponential; //Media distribuzione esponenziale B
-        volatile double writeSizeForUniform = default(uniform(0,10)); //Range distribuzione uniforme B
-        
-        int rng0;
-        int rng1;
-        int rng2;
+        volatile int writeSizeForUniform = default(intuniform(0,100000)); //Range distribuzione uniforme B
 
         @signal[writeRequestResponseTime];
         @statistic[meanResponseTime](source=writeRequestResponseTime; record=mean,vector);
