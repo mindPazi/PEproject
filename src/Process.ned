@@ -31,7 +31,7 @@ simple Process
         volatile int writeSizeForUniform @unit(kB) = default(intuniform(0,100000)); //Range distribuzione uniforme B
 
         @signal[writeRequestResponseTime];
-        @statistic[meanResponseTime](source=writeRequestResponseTime; record=mean,vector);
+        @statistic[meanResponseTime](source="writeRequestResponseTime"; record=stats,vector);
     gates:
         input in;
         output out;
