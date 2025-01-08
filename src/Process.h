@@ -37,7 +37,8 @@ private:
     simsignal_t writeRequestResponseTimeSignal_;
 
     // Distribuzioni di B
-    double meanWriteSizeForExponential;
+    int meanWriteSizeForExponential;
+    int maxWriteSizeForUniform;
     bool uniformWriteSizeDistribution;
 
 

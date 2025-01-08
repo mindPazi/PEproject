@@ -25,7 +25,7 @@ simple Disk
         double seekTime @unit(ms); // S tempo per muovere la testina
         double interChunkDelay @unit(ms); // L tempo che intercorre tra due scrittura consecutive dello stesso file
         int maxChunkSize @unit(kB); // K
-        volatile double itsADifferentFileGenerator = default(uniform(0,10));
+        volatile double itsADifferentFileGenerator = default(uniform(0,10,0));
 
         @signal[writeFileTime];
         @statistic[writeFileTimeStats](source="writeFileTime"; record=stats,vector);

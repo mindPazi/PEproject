@@ -29,7 +29,8 @@ void Process::initialize() {
 
     uniformWriteSizeDistribution = par("uniformWriteSizes").boolValue();
     meanWriteSizeForExponential =
-            par("meanWriteSizeForExponential").doubleValue();
+            par("meanWriteSizeForExponential").intValue();
+    maxWriteSizeForUniform = par("maxWriteSizeForUniform").intValue();
 
     writeRequestResponseTimeSignal_ = registerSignal(
             "writeRequestResponseTime");
@@ -84,7 +85,7 @@ void Process::sendWriteRequest() {
     int bytesToWrite;
     if (uniformWriteSizeDistribution) {
         // usa il rng 0
-        bytesToWrite = par("writeSizeForUniform").intValue();
+        bytesToWrite = intuniform(0, maxWriteSizeForUniform, 0);
         EV << "bytes to write uniform using rng0: "<<bytesToWrite<<endl;
     } else {
         //usa il rng 1
