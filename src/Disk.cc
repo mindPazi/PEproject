@@ -190,11 +190,10 @@ void Disk::sendWriteCompleted(int processId, double writeTime) {
 
 void Disk::finish() {
     // Calcolo delle metriche
+    totalBusyTime_ += (simTime() - lastBusyStart_).dbl();
     double simDuration = simTime().dbl();
-    if (totalBusyTime_ == 0) // se totalBusyTime==0 vuoldire che il disco non è mai stato libero e la statistica non è stata aggiornata
-        totalBusyTime_ = simDuration;
 
-    double diskUtilization = (totalBusyTime_ / simDuration) * 100.0; // *100 per esprimere la percentuale
+    double diskUtilization = (totalBusyTime_ / simDuration) *100; // *100 per esprimere la percentuale
     emit(busyPercentageSignal_, diskUtilization);
 
     double averageQueueLength = totalQueueLengthTime_ / simDuration;
