@@ -15,6 +15,7 @@
 
 #include "Process.h"
 
+
 Define_Module(Process);
 
 //todo: capire come gestire la generazione dei tempi di interarrivo e della dim dei file
@@ -49,13 +50,23 @@ void Process::handleMessage(cMessage *msg) {
         delete msg;
     } else {
         // Ricezione di una risposta
+
         // Controlla se ci sono richieste in attesa nella coda
         if (!sentRequests_.empty()) {
-            simtime_t sentTime = sentRequests_.front();
+            double responseTime = 0;
+            WriteCompleted *wcMsg = check_and_cast<WriteCompleted*>(msg);
+                        simtime_t sentTime = sentRequests_.front();
             sentRequests_.pop();
-            simtime_t responseTime = simTime() - sentTime;
+            simtime_t responseTime_t = simTime() - sentTime;
+            if(responseTime_t == 0){
+                responseTime = wcMsg->getWriteTime() * 1000; //In secondi
+            }else{
+                responseTime = responseTime_t.dbl() *1000;
+            }
+            EV << "responseTime_t " << responseTime_t << ", sentTime "
+                                  << sentTime << " \n";
             EV << "Process " << processId_ << " received a response after"
-                      << responseTime << "\n";
+                      << responseTime << "milliseconds \n";
             emit(writeRequestResponseTimeSignal_, responseTime);
         } else {
             EV

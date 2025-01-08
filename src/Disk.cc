@@ -139,7 +139,7 @@ void Disk::writeAndSchedule(WriteRequest *nextReq) {
     else
         // aggiunge inter chunk delay
         writeTime = interChunkDelay_;
-
+    EV << "Disk writeTime " << writeTime << "\n";
     //estraggo la dim del file
     int fileSize = nextReq->getBytesToWrite();
     if (fileSize > maxChunkSize_) {
@@ -163,11 +163,12 @@ void Disk::writeAndSchedule(WriteRequest *nextReq) {
         delete nextReq;
         scheduleAt(simTime() + writeTime, new cMessage()); // gestisce l'estrazione di un processo dalla coda
     }
+    EV << "Disk writeTime " << writeTime << "\n";
 }
 
 bool Disk::itsADifferentFile() {
     // ritorna con prob del 10% che il file sia lo stesso del precedente
-    if (par("itsADifferentFileGenerator").doubleValue() <= 0.1)
+    if (par("itsADifferentFileGenerator").doubleValue() >= 0.2)
         return true;
     return false;
 }

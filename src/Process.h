@@ -18,6 +18,7 @@
 
 #include <omnetpp.h>
 #include "WriteRequest_m.h"
+#include "WriteCompleted_m.h"
 #include <queue>
 
 using namespace omnetpp;
