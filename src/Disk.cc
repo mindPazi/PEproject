@@ -167,7 +167,6 @@ void Disk::writeAndSchedule(WriteRequest *nextReq) {
 }
 
 bool Disk::itsADifferentFile() {
-    // ritorna con prob del 10% che il file sia lo stesso del precedente
     if (par("itsADifferentFileGenerator").doubleValue() >= 0.2)
         return true;
     return false;
